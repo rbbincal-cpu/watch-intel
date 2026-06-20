@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;}
+  body{margin:0;background:#FAF6F0;color:#1C1917;font-family:'Inter',-apple-system,sans-serif;font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  button{font-family:inherit;cursor:pointer;}
+  input,select,textarea{font-family:inherit;font-size:13px;}
+  ::placeholder{color:#A8A29E;}
+  a{color:inherit;text-decoration:none;}
+  table{border-collapse:collapse;}
+  @keyframes wi-spin{to{transform:rotate(360deg);}}
+  @keyframes wi-fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+  .wi-scroll::-webkit-scrollbar{height:9px;width:9px;}
+  .wi-scroll::-webkit-scrollbar-thumb{background:#DDD3C2;border-radius:99px;}
+</style>
+</helmet>
+<div style="min-height:100vh;">
+
+  <header style="position:sticky;top:0;z-index:20;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border-bottom:1px solid #EDE6DA;">
+    <div style="max-width:1240px;margin:0 auto;padding:14px 20px;display:flex;flex-wrap:wrap;align-items:center;gap:10px 26px;">
+      <div style="display:flex;align-items:baseline;gap:10px;">
+        <span style="font-family:'Playfair Display',serif;font-weight:700;font-size:22px;letter-spacing:.01em;">Watch<span style="color:#B08D3E;">Intel</span></span>
+        <span style="font-size:11px;color:#A8A29E;letter-spacing:.06em;text-transform:uppercase;">Inventory Monitor</span>
+      </div>
+      <nav style="display:flex;gap:20px;">
+        <button onClick="{{ goOverview }}" style="{{ navOverview }}">Overview</button>
+        <button onClick="{{ goGentry }}" style="{{ navGentry }}">Gentry</button>
+        <button onClick="{{ goOnetime }}" style="{{ navOnetime }}">1TimePiece</button>
+        <button onClick="{{ goSales }}" style="{{ navSales }}">Sales</button>
+        <button onClick="{{ goArchive }}" style="{{ navArchive }}">Price Archive</button>
+      </nav>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:12px;">
+        <span style="font-size:11.5px;color:#78716C;text-align:right;line-height:1.35;">{{ updatedText }}</span>
+        <button onClick="{{ refresh }}" style="display:inline-flex;align-items:center;gap:7px;background:#1C1917;color:#fff;border:none;border-radius:99px;padding:8px 15px;font-size:12.5px;font-weight:600;">
+          <span style="{{ spinStyle }}">↻</span>{{ refreshLabel }}
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main style="max-width:1240px;margin:0 auto;padding:26px 18px 80px;">
+
+    <sc-if value="{{ stale }}" hint-placeholder-val="{{ false }}">
+      <div style="background:#FEF3C7;border:1px solid #FDE68A;color:#92400E;border-radius:10px;padding:9px 14px;font-size:12.5px;margin-bottom:18px;">Showing the last saved snapshot — live refresh didn't go through. Hit refresh to retry.</div>
+    </sc-if>
+
+    <sc-if value="{{ showLoading }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:120px 0;gap:18px;">
+        <div style="width:34px;height:34px;border:3px solid #EDE6DA;border-top-color:#B08D3E;border-radius:50%;animation:wi-spin .8s linear infinite;"></div>
+        <div style="font-size:14px;color:#78716C;">Fetching live inventory from Gentry &amp; 1TimePiece…</div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ showError }}" hint-placeholder-val="{{ false }}">
+      <div style="background:#FCE7EB;border:1px solid #F9C9D4;color:#9F1239;border-radius:10px;padding:16px 18px;">
+        <div style="font-weight:600;margin-bottom:4px;">Couldn't load the live data.</div>
+        <div style="font-size:13px;">{{ errorMsg }}</div>
+        <button onClick="{{ refresh }}" style="margin-top:10px;background:#9F1239;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:13px;">Try again</button>
+      </div>
+    </sc-if>
+
+    <!-- ════════ OVERVIEW ════════ -->
+    <sc-if value="{{ showOverview }}" hint-placeholder-val="{{ false }}">
+    <div>
+      <h2 style="font-family:'Playfair Display',serif;font-size:25px;font-weight:600;margin:0 0 3px;">Market Overview</h2>
+      <p style="color:#78716C;font-size:13px;margin:0 0 18px;">Two sources, live. Peso values from listed prices. 1TimePiece excludes pieces marked sold.</p>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:26px;">
+        <sc-for list="{{ overviewKpis }}" as="k" hint-placeholder-count="4">
+          <div style="background:#fff;border:1px solid #EDE6DA;border-radius:12px;padding:16px 18px;">
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#78716C;">{{ k.label }}</div>
+            <div style="font-family:'Playfair Display',serif;font-size:27px;margin-top:5px;line-height:1.1;">{{ k.value }}</div>
+            <div style="font-size:12px;color:#78716C;margin-top:3px;">{{ k.delta }}</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <h3 style="font-family:'Playfair Display',serif;font-size:17px;font-weight:600;margin:0 0 10px;">Sources side by side</h3>
+      <div class="wi-scroll" style="overflow-x:auto;background:#fff;border:1px solid #EDE6DA;border-radius:12px;margin-bottom:30px;">
+        <table style="width:100%;min-width:620px;font-size:13.5px;">
+          <thead><tr>
+            <th style="text-align:left;padding:11px 14px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;">Source</th>
+            <th style="text-align:right;padding:11px 14px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;">Pieces</th>
+            <th style="text-align:right;padding:11px 14px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;">Inventory value</th>
+            <th style="text-align:right;padding:11px 14px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;">Avg ticket</th>
+            <th style="text-align:right;padding:11px 14px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;">Brands</th>
+            <th style="text-align:right;padding:11px 14px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;">Notes</th>
+          </tr></thead>
+          <tbody>
+            <sc-for list="{{ sourceRows }}" as="s" hint-placeholder-count="2">
+              <tr>
+                <td style="text-align:left;padding:12px 14px;border-bottom:1px solid #F3EEE4;font-weight:600;">{{ s.name }}</td>
+                <td style="text-align:right;padding:12px 14px;border-bottom:1px solid #F3EEE4;font-variant-numeric:tabular-nums;">{{ s.count }}</td>
+                <td style="text-align:right;padding:12px 14px;border-bottom:1px solid #F3EEE4;font-variant-numeric:tabular-nums;font-weight:600;">{{ s.value }}</td>
+                <td style="text-align:right;padding:12px 14px;border-bottom:1px solid #F3EEE4;font-variant-numeric:tabular-nums;">{{ s.avg }}</td>
+                <td style="text-align:right;padding:12px 14px;border-bottom:1px solid #F3EEE4;">{{ s.brands }}</td>
+                <td style="text-align:right;padding:12px 14px;border-bottom:1px solid #F3EEE4;color:#78716C;font-size:12.5px;">{{ s.note }}</td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style="font-family:'Playfair Display',serif;font-size:17px;font-weight:600;margin:0 0 4px;">Value over time</h3>
+      <p style="color:#78716C;font-size:12.5px;margin:0 0 12px;">History accumulates each day you open the dashboard.</p>
+      <div style="background:#fff;border:1px solid #EDE6DA;border-radius:12px;padding:18px;margin-bottom:30px;">
+        <sc-if value="{{ hasHistory }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:flex-end;gap:6px;height:150px;">
+            <sc-for list="{{ historyBars }}" as="h" hint-placeholder-count="8">
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;">
+                <div style="width:100%;display:flex;flex-direction:column;justify-content:flex-end;height:120px;">
+                  <div title="{{ h.title }}" style="{{ h.barStyle }}"></div>
+                </div>
+                <div style="font-size:10px;color:#A8A29E;white-space:nowrap;">{{ h.label }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ noHistory }}" hint-placeholder-val="{{ false }}">
+          <div style="color:#A8A29E;font-size:13px;padding:24px 0;text-align:center;">First snapshot saved today — come back tomorrow to see the trend build.</div>
+        </sc-if>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;" class="wi-cols">
+        <div style="background:#fff;border:1px solid #EDE6DA;border-radius:12px;padding:18px;">
+          <h3 style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin:0 0 12px;">Gentry — value by brand</h3>
+          <sc-for list="{{ gBrandRows }}" as="b" hint-placeholder-count="6">
+            <div style="display:flex;align-items:center;gap:11px;padding:6px 0;">
+              <div style="width:130px;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ b.key }}</div>
+              <div style="flex:1;height:9px;background:#F1EADD;border-radius:99px;overflow:hidden;"><div style="{{ b.barStyle }}"></div></div>
+              <div style="width:64px;text-align:right;font-size:12.5px;font-variant-numeric:tabular-nums;">{{ b.vshort }}</div>
+              <div style="width:30px;text-align:right;font-size:11.5px;color:#A8A29E;">{{ b.n }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="background:#fff;border:1px solid #EDE6DA;border-radius:12px;padding:18px;">
+          <h3 style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin:0 0 12px;">1TimePiece — value by brand</h3>
+          <sc-for list="{{ oBrandRows }}" as="b" hint-placeholder-count="6">
+            <div style="display:flex;align-items:center;gap:11px;padding:6px 0;">
+              <div style="width:130px;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ b.key }}</div>
+              <div style="flex:1;height:9px;background:#F1EADD;border-radius:99px;overflow:hidden;"><div style="{{ b.barStyle }}"></div></div>
+              <div style="width:64px;text-align:right;font-size:12.5px;font-variant-numeric:tabular-nums;">{{ b.vshort }}</div>
+              <div style="width:30px;text-align:right;font-size:11.5px;color:#A8A29E;">{{ b.n }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ════════ GENTRY ════════ -->
+    <sc-if value="{{ showGentry }}" hint-placeholder-val="{{ false }}">
+    <div>
+      <h2 style="font-family:'Playfair Display',serif;font-size:25px;font-weight:600;margin:0 0 3px;">Gentry Timepieces</h2>
+      <p style="color:#78716C;font-size:13px;margin:0 0 18px;"><a href="https://www.gentry.ph" target="_blank" rel="noopener" style="color:#B08D3E;">gentry.ph</a> · own retail stock · live from Shopify catalog</p>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:12px;margin-bottom:24px;">
+        <sc-for list="{{ gentryKpis }}" as="k" hint-placeholder-count="4">
+          <div style="background:#fff;border:1px solid #EDE6DA;border-radius:12px;padding:16px 18px;">
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#78716C;">{{ k.label }}</div>
+            <div style="font-family:'Playfair Display',serif;font-size:25px;margin-top:5px;line-height:1.1;">{{ k.value }}</div>
+            <div style="font-size:12px;color:#78716C;margin-top:3px;">{{ k.delta }}</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="background:#fff;border:1px solid #EDE6DA;border-radius:12px;padding:18px;margin-bottom:24px;">
+        <h3 style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin:0 0 12px;">Value by brand</h3>
+        <sc-for list="{{ gBrandRows }}" as="b" hint-placeholder-count="8">
+          <div style="display:flex;align-items:center;gap:11px;padding:6px 0;">
+            <div style="width:150px;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ b.key }}</div>
+            <div style="flex:1;height:9px;background:#F1EADD;border-radius:99px;overflow:hidden;"><div style="{{ b.barStyle }}"></div></div>
+            <div style="width:72px;text-align:right;font-size:12.5px;font-variant-numeric:tabular-nums;">{{ b.vshort }}</div>
+            <div style="width:34px;text-align:right;font-size:11.5px;color:#A8A29E;">{{ b.n }}</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:10px;">
+        <h3 style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin:0;">Live listings <span style="color:#A8A29E;font-weight:400;font-size:13px;">({{ gCount }})</span></h3>
+        <div style="margin-left:auto;display:flex;gap:8px;">
+          <input value="{{ gentrySearch }}" onInput="{{ onGentrySearch }}" placeholder="Search model / ref…" style="border:1px solid #E2DACB;border-radius:8px;padding:7px 11px;width:200px;background:#fff;">
+          <select value="{{ gentrySort }}" onChange="{{ onGentrySort }}" style="border:1px solid #E2DACB;border-radius:8px;padding:7px 10px;background:#fff;">
+            <option value="value">Price ↓</option>
+            <option value="value_asc">Price ↑</option>
+            <option value="name">Name A–Z</option>
+            <option value="brand">Brand</option>
+            <option value="year">Year ↓</option>
+          </select>
+        </div>
+      </div>
+      <div class="wi-scroll" style="overflow:auto;max-height:620px;background:#fff;border:1px solid #EDE6DA;border-radius:12px;">
+        <table style="width:100%;min-width:720px;font-size:13px;">
+          <thead><tr>
+            <th style="position:sticky;top:0;text-align:left;padding:10px 14px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Watch</th>
+            <th style="position:sticky;top:0;text-align:left;padding:10px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Brand</th>
+            <th style="position:sticky;top:0;text-align:left;padding:10px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Ref</th>
+            <th style="position:sticky;top:0;text-align:right;padding:10px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Year</th>
+            <th style="position:sticky;top:0;text-align:left;padding:10px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Inclusions</th>
+            <th style="position:sticky;top:0;text-align:right;padding:10px 14px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Price</th>
+          </tr></thead>
+          <tbody>
+            <sc-for list="{{ gListings }}" as="w" hint-placeholder-count="12">
+              <tr>
+                <td style="text-align:left;padding:9px 14px;border-bottom:1px solid #F3EEE4;max-width:380px;">
+                  <a href="{{ w.url }}" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;">
+                    <img src="{{ w.img }}" loading="lazy" style="width:34px;height:34px;border-radius:6px;object-fit:cover;background:#F1EADD;flex:none;">
+                    <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ w.name }}</span>
+                  </a>
+                </td>
+                <td style="text-align:left;padding:9px 12px;border-bottom:1px solid #F3EEE4;color:#57534E;">{{ w.brand }}</td>
+                <td style="text-align:left;padding:9px 12px;border-bottom:1px solid #F3EEE4;color:#78716C;font-variant-numeric:tabular-nums;">{{ w.ref }}</td>
+                <td style="text-align:right;padding:9px 12px;border-bottom:1px solid #F3EEE4;color:#78716C;font-variant-numeric:tabular-nums;">{{ w.year }}</td>
+                <td style="text-align:left;padding:9px 12px;border-bottom:1px solid #F3EEE4;">
+                  <div style="display:flex;flex-wrap:wrap;gap:4px;">
+                    <sc-for list="{{ w.incl }}" as="c" hint-placeholder-count="1">
+                      <span style="display:inline-block;font-size:10px;padding:1px 6px;border-radius:4px;background:#F1EADD;color:#6b5318;white-space:nowrap;">{{ c }}</span>
+                    </sc-for>
+                  </div>
+                </td>
+                <td style="text-align:right;padding:9px 14px;border-bottom:1px solid #F3EEE4;font-weight:600;font-variant-numeric:tabular-nums;">{{ w.price }}</td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ════════ 1TIMEPIECE ════════ -->
+    <sc-if value="{{ showOnetime }}" hint-placeholder-val="{{ false }}">
+    <div>
+      <h2 style="font-family:'Playfair Display',serif;font-size:25px;font-weight:600;margin:0 0 3px;">1TimePiece</h2>
+      <p style="color:#78716C;font-size:13px;margin:0 0 18px;">Consignment partner network · live from the shared pricelist · 27 brand tabs · partner code from column E</p>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px;">
+        <sc-for list="{{ onetimeKpis }}" as="k" hint-placeholder-count="5">
+          <div style="background:#fff;border:1px solid #EDE6DA;border-radius:12px;padding:16px 18px;">
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#78716C;">{{ k.label }}</div>
+            <div style="font-family:'Playfair Display',serif;font-size:25px;margin-top:5px;line-height:1.1;">{{ k.value }}</div>
+            <div style="font-size:12px;color:#78716C;margin-top:3px;">{{ k.delta }}</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <h3 style="font-family:'Playfair Display',serif;font-size:17px;font-weight:600;margin:0 0 4px;">Inventory by partner</h3>
+      <p style="color:#78716C;font-size:12.5px;margin:0 0 12px;">Each consignment partner's share of total listed value.</p>
+      <div class="wi-scroll" style="overflow-x:auto;background:#fff;border:1px solid #EDE6DA;border-radius:12px;margin-bottom:28px;">
+        <table style="width:100%;min-width:560px;font-size:13.5px;">
+          <thead><tr>
+            <th style="text-align:left;padding:11px 16px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;">Partner</th>
+            <th style="text-align:right;padding:11px 14px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;">Pieces</th>
+            <th style="text-align:right;padding:11px 14px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;">Inventory value</th>
+            <th style="text-align:right;padding:11px 14px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;">Avg ticket</th>
+            <th style="text-align:left;padding:11px 16px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;width:38%;">Share</th>
+          </tr></thead>
+          <tbody>
+            <sc-for list="{{ partnerRows }}" as="p" hint-placeholder-count="7">
+              <tr style="{{ p.rowStyle }}">
+                <td style="text-align:left;padding:11px 16px;border-bottom:1px solid #F3EEE4;font-weight:600;"><span style="{{ p.dotStyle }}"></span>{{ p.label }}</td>
+                <td style="text-align:right;padding:11px 14px;border-bottom:1px solid #F3EEE4;font-variant-numeric:tabular-nums;">{{ p.n }}</td>
+                <td style="text-align:right;padding:11px 14px;border-bottom:1px solid #F3EEE4;font-variant-numeric:tabular-nums;font-weight:600;">{{ p.value }}</td>
+                <td style="text-align:right;padding:11px 14px;border-bottom:1px solid #F3EEE4;font-variant-numeric:tabular-nums;color:#57534E;">{{ p.avg }}</td>
+                <td style="text-align:left;padding:11px 16px;border-bottom:1px solid #F3EEE4;">
+                  <div style="display:flex;align-items:center;gap:10px;">
+                    <div style="flex:1;height:9px;background:#F1EADD;border-radius:99px;overflow:hidden;"><div style="{{ p.barStyle }}"></div></div>
+                    <span style="width:42px;text-align:right;font-size:12px;color:#78716C;font-variant-numeric:tabular-nums;">{{ p.share }}</span>
+                  </div>
+                </td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:10px;">
+        <h3 style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin:0;">Listings <span style="color:#A8A29E;font-weight:400;font-size:13px;">({{ oCount }})</span></h3>
+        <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;">
+          <input value="{{ oneSearch }}" onInput="{{ onOneSearch }}" placeholder="Search model / ref…" style="border:1px solid #E2DACB;border-radius:8px;padding:7px 11px;width:180px;background:#fff;">
+          <select value="{{ onePartner }}" onChange="{{ onOnePartner }}" style="border:1px solid #E2DACB;border-radius:8px;padding:7px 10px;background:#fff;">
+            <sc-for list="{{ partnerOptions }}" as="o" hint-placeholder-count="8">
+              <option value="{{ o.v }}">{{ o.t }}</option>
+            </sc-for>
+          </select>
+          <select value="{{ oneSort }}" onChange="{{ onOneSort }}" style="border:1px solid #E2DACB;border-radius:8px;padding:7px 10px;background:#fff;">
+            <option value="value">Price ↓</option>
+            <option value="value_asc">Price ↑</option>
+            <option value="brand">Brand</option>
+            <option value="name">Name A–Z</option>
+          </select>
+        </div>
+      </div>
+      <div class="wi-scroll" style="overflow:auto;max-height:620px;background:#fff;border:1px solid #EDE6DA;border-radius:12px;">
+        <table style="width:100%;min-width:760px;font-size:13px;">
+          <thead><tr>
+            <th style="position:sticky;top:0;text-align:left;padding:10px 14px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Watch</th>
+            <th style="position:sticky;top:0;text-align:left;padding:10px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Brand</th>
+            <th style="position:sticky;top:0;text-align:left;padding:10px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Ref</th>
+            <th style="position:sticky;top:0;text-align:center;padding:10px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Partner</th>
+            <th style="position:sticky;top:0;text-align:left;padding:10px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Inclusions</th>
+            <th style="position:sticky;top:0;text-align:right;padding:10px 14px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Price</th>
+          </tr></thead>
+          <tbody>
+            <sc-for list="{{ oListings }}" as="w" hint-placeholder-count="12">
+              <tr>
+                <td style="text-align:left;padding:9px 14px;border-bottom:1px solid #F3EEE4;max-width:380px;"><div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ w.name }}</div></td>
+                <td style="text-align:left;padding:9px 12px;border-bottom:1px solid #F3EEE4;color:#57534E;">{{ w.brand }}</td>
+                <td style="text-align:left;padding:9px 12px;border-bottom:1px solid #F3EEE4;color:#78716C;font-variant-numeric:tabular-nums;">{{ w.ref }}</td>
+                <td style="text-align:center;padding:9px 12px;border-bottom:1px solid #F3EEE4;"><span style="{{ w.partnerStyle }}">{{ w.partnerLabel }}</span></td>
+                <td style="text-align:left;padding:9px 12px;border-bottom:1px solid #F3EEE4;">
+                  <div style="display:flex;flex-wrap:wrap;gap:4px;">
+                    <sc-for list="{{ w.incl }}" as="c" hint-placeholder-count="2">
+                      <span style="display:inline-block;font-size:10px;padding:1px 6px;border-radius:4px;background:#F1EADD;color:#6b5318;white-space:nowrap;">{{ c }}</span>
+                    </sc-for>
+                  </div>
+                </td>
+                <td style="text-align:right;padding:9px 14px;border-bottom:1px solid #F3EEE4;font-weight:600;font-variant-numeric:tabular-nums;">{{ w.price }}</td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ════════ SALES ════════ -->
+    <sc-if value="{{ showSales }}" hint-placeholder-val="{{ false }}">
+    <div>
+      <h2 style="font-family:'Playfair Display',serif;font-size:25px;font-weight:600;margin:0 0 3px;">Sales Monitor</h2>
+      <p style="color:#78716C;font-size:13px;margin:0 0 18px;max-width:760px;">Sales are detected <b style="color:#1C1917;font-weight:600;">automatically</b>: each refresh, any watch that leaves Gentry or 1TimePiece inventory (delisted, or marked sold) is logged here at its last-known price and tagged <span style="display:inline-block;font-size:9px;letter-spacing:.04em;padding:1px 5px;border-radius:4px;background:#F1EADD;color:#9a7b2e;vertical-align:middle;">AUTO</span>. You can also record one by hand — add the cost to any sale to see true profit. The year selector extends into future years as you grow.</p>
+
+      <sc-if value="{{ salesHasAuto }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:9px;background:#FBF3E6;border:1px solid #ECDCB8;color:#6b5318;border-radius:10px;padding:9px 13px;font-size:12.5px;margin:0 0 18px;">
+          <span style="font-size:13px;">⟳</span><span>{{ salesAutoNote }}</span>
+        </div>
+      </sc-if>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px;">
+        <sc-for list="{{ salesKpis }}" as="k" hint-placeholder-count="5">
+          <div style="background:#fff;border:1px solid #EDE6DA;border-radius:12px;padding:16px 18px;">
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#78716C;">{{ k.label }}</div>
+            <div style="font-family:'Playfair Display',serif;font-size:24px;margin-top:5px;line-height:1.1;color:{{ k.color }};">{{ k.value }}</div>
+            <div style="font-size:12px;color:#78716C;margin-top:3px;">{{ k.delta }}</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="background:#fff;border:1px solid #EDE6DA;border-radius:12px;padding:18px 20px;margin-bottom:26px;">
+        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:18px;">
+          <h3 style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin:0;">Monthly sales · {{ salesYearLabel }}</h3>
+          <div style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;">
+            <sc-for list="{{ salesYears }}" as="y" hint-placeholder-count="4">
+              <button onClick="{{ y.onClick }}" style="{{ y.style }}">{{ y.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:flex;align-items:flex-end;gap:8px;height:175px;">
+          <sc-for list="{{ monthBars }}" as="m" hint-placeholder-count="12">
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;">
+              <div style="font-size:9.5px;color:#57534E;font-variant-numeric:tabular-nums;white-space:nowrap;height:12px;">{{ m.valLabel }}</div>
+              <div style="width:100%;display:flex;flex-direction:column;justify-content:flex-end;height:120px;">
+                <div title="{{ m.title }}" style="{{ m.barStyle }}"></div>
+              </div>
+              <div style="font-size:11px;color:#A8A29E;">{{ m.label }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:10px;">
+        <h3 style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin:0;">Sales detail · {{ salesYearLabel }} <span style="color:#A8A29E;font-weight:400;font-size:13px;">({{ salesCount }})</span></h3>
+        <button onClick="{{ goLogSale }}" style="margin-left:auto;background:#B08D3E;color:#fff;border:none;border-radius:9px;padding:9px 15px;font-size:13px;font-weight:600;">+ Log a sale</button>
+      </div>
+      <div class="wi-scroll" style="overflow:auto;max-height:560px;background:#fff;border:1px solid #EDE6DA;border-radius:12px;">
+        <table style="width:100%;min-width:900px;font-size:13px;">
+          <thead><tr>
+            <th style="position:sticky;top:0;text-align:left;padding:10px 14px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Date sold</th>
+            <th style="position:sticky;top:0;text-align:left;padding:10px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Watch</th>
+            <th style="position:sticky;top:0;text-align:left;padding:10px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Brand</th>
+            <th style="position:sticky;top:0;text-align:left;padding:10px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Ref</th>
+            <th style="position:sticky;top:0;text-align:left;padding:10px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Inclusions</th>
+            <th style="position:sticky;top:0;text-align:left;padding:10px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Channel</th>
+            <th style="position:sticky;top:0;text-align:right;padding:10px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Sale price</th>
+            <th style="position:sticky;top:0;text-align:right;padding:10px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Cost</th>
+            <th style="position:sticky;top:0;text-align:right;padding:10px 14px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Profit</th>
+          </tr></thead>
+          <tbody>
+            <sc-for list="{{ saleRows }}" as="r" hint-placeholder-count="5">
+              <tr>
+                <td style="text-align:left;padding:9px 14px;border-bottom:1px solid #F3EEE4;color:#57534E;font-variant-numeric:tabular-nums;white-space:nowrap;">{{ r.date }}<sc-if value="{{ r.auto }}" hint-placeholder-val="{{ false }}"><span style="display:inline-block;margin-left:6px;font-size:9px;letter-spacing:.04em;padding:1px 5px;border-radius:4px;background:#F1EADD;color:#9a7b2e;vertical-align:middle;">AUTO</span></sc-if></td>
+                <td style="text-align:left;padding:9px 12px;border-bottom:1px solid #F3EEE4;max-width:260px;"><div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ r.watch }}</div></td>
+                <td style="text-align:left;padding:9px 12px;border-bottom:1px solid #F3EEE4;color:#57534E;">{{ r.brand }}</td>
+                <td style="text-align:left;padding:9px 12px;border-bottom:1px solid #F3EEE4;color:#78716C;font-variant-numeric:tabular-nums;">{{ r.ref }}</td>
+                <td style="text-align:left;padding:9px 12px;border-bottom:1px solid #F3EEE4;">
+                  <div style="display:flex;flex-wrap:wrap;gap:4px;">
+                    <sc-for list="{{ r.incl }}" as="c" hint-placeholder-count="1">
+                      <span style="display:inline-block;font-size:10px;padding:1px 6px;border-radius:4px;background:#F1EADD;color:#6b5318;white-space:nowrap;">{{ c }}</span>
+                    </sc-for>
+                  </div>
+                </td>
+                <td style="text-align:left;padding:9px 12px;border-bottom:1px solid #F3EEE4;color:#78716C;">{{ r.channel }}</td>
+                <td style="text-align:right;padding:9px 12px;border-bottom:1px solid #F3EEE4;font-weight:600;font-variant-numeric:tabular-nums;">{{ r.price }}</td>
+                <td style="text-align:right;padding:9px 12px;border-bottom:1px solid #F3EEE4;color:#78716C;font-variant-numeric:tabular-nums;">{{ r.cost }}</td>
+                <td style="{{ r.profitStyle }}">{{ r.profit }}</td>
+              </tr>
+            </sc-for>
+            <sc-if value="{{ salesEmpty }}" hint-placeholder-val="{{ false }}">
+              <tr><td colspan="9" style="padding:34px 20px;text-align:center;color:#A8A29E;font-size:13px;line-height:1.6;">No sales recorded for {{ salesYearLabel }} yet.<br>Sales appear here <b style="color:#78716C;">automatically</b> when a watch leaves Gentry or 1TimePiece inventory — or use <b style="color:#9a7b2e;">+ Log a sale</b> to record one by hand.</td></tr>
+            </sc-if>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ════════ PRICE ARCHIVE ════════ -->
+    <sc-if value="{{ showArchive }}" hint-placeholder-val="{{ false }}">
+    <div>
+      <h2 style="font-family:'Playfair Display',serif;font-size:25px;font-weight:600;margin:0 0 3px;">Price Archive</h2>
+      <p style="color:#78716C;font-size:13px;margin:0 0 18px;max-width:680px;">Your permanent price book. Log what you buy, sell, or quote — then look up any reference to see its history and a suggested buy-in. Saved in this browser; export anytime for a portable backup.</p>
+
+      <!-- lookup -->
+      <div style="background:#1C1917;color:#fff;border-radius:14px;padding:20px 22px;margin-bottom:22px;">
+        <div style="font-family:'Playfair Display',serif;font-size:17px;margin-bottom:4px;">Deal check</div>
+        <div style="font-size:12.5px;color:#B6ADA0;margin-bottom:12px;">Someone's offering you a watch? Type the model or reference to pull every comp — archive + both live sources.</div>
+        <input value="{{ lookupQuery }}" onInput="{{ onLookup }}" placeholder="e.g. 126710BLRO, Daytona, Nautilus…" style="width:100%;border:1px solid #3A3531;background:#262220;color:#fff;border-radius:9px;padding:11px 13px;font-size:14px;margin-bottom:14px;">
+        <sc-if value="{{ hasLookup }}" hint-placeholder-val="{{ false }}">
+          <div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:14px;">
+              <sc-for list="{{ lookupStats }}" as="s" hint-placeholder-count="4">
+                <div style="background:#262220;border:1px solid #3A3531;border-radius:10px;padding:11px 13px;">
+                  <div style="font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:#9C938A;">{{ s.label }}</div>
+                  <div style="font-family:'Playfair Display',serif;font-size:20px;margin-top:3px;color:{{ s.color }};">{{ s.value }}</div>
+                  <div style="font-size:11px;color:#9C938A;">{{ s.sub }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="background:#2A2420;border:1px solid #4A3B22;border-radius:10px;padding:12px 14px;margin-bottom:14px;">
+              <div style="font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:#D8B978;margin-bottom:8px;">Suggested buy-in vs lowest live ask ({{ lowestAsk }})</div>
+              <div style="display:flex;flex-wrap:wrap;gap:18px;">
+                <sc-for list="{{ buyTiers }}" as="t" hint-placeholder-count="3">
+                  <div><span style="font-size:12px;color:#B6ADA0;">{{ t.label }} margin → buy under </span><span style="font-weight:700;color:#fff;">{{ t.price }}</span></div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#9C938A;margin-bottom:7px;">{{ lookupCount }} comps</div>
+            <div class="wi-scroll" style="max-height:230px;overflow:auto;">
+              <table style="width:100%;font-size:12.5px;">
+                <sc-for list="{{ lookupRows }}" as="r" hint-placeholder-count="4">
+                  <tr>
+                    <td style="text-align:left;padding:6px 8px;border-bottom:1px solid #322D29;color:#E7E1D8;max-width:300px;"><div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ r.name }}</div></td>
+                    <td style="text-align:left;padding:6px 8px;border-bottom:1px solid #322D29;"><span style="{{ r.tagStyle }}">{{ r.tag }}</span></td>
+                    <td style="text-align:right;padding:6px 8px;border-bottom:1px solid #322D29;color:#9C938A;">{{ r.date }}</td>
+                    <td style="text-align:right;padding:6px 8px;border-bottom:1px solid #322D29;font-weight:600;color:#fff;font-variant-numeric:tabular-nums;">{{ r.price }}</td>
+                  </tr>
+                </sc-for>
+              </table>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ lookupEmpty }}" hint-placeholder-val="{{ false }}">
+          <div style="color:#9C938A;font-size:13px;padding:6px 0;">No comps found for “{{ lookupQuery }}”. Try a shorter reference or model name.</div>
+        </sc-if>
+      </div>
+
+      <!-- toolbar -->
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:14px;">
+        <button onClick="{{ toggleForm }}" style="background:#B08D3E;color:#fff;border:none;border-radius:9px;padding:9px 15px;font-size:13px;font-weight:600;">+ Add entry</button>
+        <button onClick="{{ logMarket }}" style="background:#fff;color:#1C1917;border:1px solid #E2DACB;border-radius:9px;padding:9px 15px;font-size:13px;font-weight:600;">Log today's market</button>
+        <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;">
+          <input value="{{ archiveSearch }}" onInput="{{ onArchiveSearch }}" placeholder="Filter archive…" style="border:1px solid #E2DACB;border-radius:8px;padding:7px 11px;width:170px;background:#fff;">
+          <button onClick="{{ exportJSON }}" style="background:#fff;color:#57534E;border:1px solid #E2DACB;border-radius:8px;padding:7px 12px;font-size:12.5px;">Export JSON</button>
+          <button onClick="{{ exportCSV }}" style="background:#fff;color:#57534E;border:1px solid #E2DACB;border-radius:8px;padding:7px 12px;font-size:12.5px;">Export CSV</button>
+          <label style="background:#fff;color:#57534E;border:1px solid #E2DACB;border-radius:8px;padding:7px 12px;font-size:12.5px;cursor:pointer;">Import<input type="file" accept="application/json" onChange="{{ importJSON }}" style="display:none;"></label>
+        </div>
+      </div>
+
+      <!-- add form -->
+      <sc-if value="{{ showForm }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fff;border:1px solid #E2DACB;border-radius:12px;padding:18px;margin-bottom:18px;">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;">
+            <label style="font-size:11px;color:#78716C;">Kind
+              <select data-field="kind" value="{{ form.kind }}" onChange="{{ onFormInput }}" style="display:block;width:100%;margin-top:4px;border:1px solid #E2DACB;border-radius:7px;padding:7px 9px;background:#fff;">
+                <option value="Bought">Bought (we paid)</option>
+                <option value="Sold">Sold (we sold)</option>
+                <option value="Offer">Offer received</option>
+                <option value="Asking">Asking / comp</option>
+              </select>
+            </label>
+            <label style="font-size:11px;color:#78716C;">Brand<input data-field="brand" value="{{ form.brand }}" onInput="{{ onFormInput }}" placeholder="Rolex" style="display:block;width:100%;margin-top:4px;border:1px solid #E2DACB;border-radius:7px;padding:7px 9px;"></label>
+            <label style="font-size:11px;color:#78716C;">Model<input data-field="model" value="{{ form.model }}" onInput="{{ onFormInput }}" placeholder="GMT-Master II Batman" style="display:block;width:100%;margin-top:4px;border:1px solid #E2DACB;border-radius:7px;padding:7px 9px;"></label>
+            <label style="font-size:11px;color:#78716C;">Reference<input data-field="ref" value="{{ form.ref }}" onInput="{{ onFormInput }}" placeholder="126710BLNR" style="display:block;width:100%;margin-top:4px;border:1px solid #E2DACB;border-radius:7px;padding:7px 9px;"></label>
+            <label style="font-size:11px;color:#78716C;">Year<input data-field="year" value="{{ form.year }}" onInput="{{ onFormInput }}" placeholder="2023" style="display:block;width:100%;margin-top:4px;border:1px solid #E2DACB;border-radius:7px;padding:7px 9px;"></label>
+            <label style="font-size:11px;color:#78716C;">Condition<input data-field="cond" value="{{ form.cond }}" onInput="{{ onFormInput }}" placeholder="Mint / full set" style="display:block;width:100%;margin-top:4px;border:1px solid #E2DACB;border-radius:7px;padding:7px 9px;"></label>
+            <label style="font-size:11px;color:#78716C;">Price ₱<input data-field="price" value="{{ form.price }}" onInput="{{ onFormInput }}" placeholder="1010000" style="display:block;width:100%;margin-top:4px;border:1px solid #E2DACB;border-radius:7px;padding:7px 9px;"></label>
+            <label style="font-size:11px;color:#78716C;">Date<input data-field="date" type="date" value="{{ form.date }}" onInput="{{ onFormInput }}" style="display:block;width:100%;margin-top:4px;border:1px solid #E2DACB;border-radius:7px;padding:7px 9px;"></label>
+            <label style="font-size:11px;color:#78716C;">Cost ₱ <span style="color:#A8A29E;">(what we paid)</span><input data-field="cost" value="{{ form.cost }}" onInput="{{ onFormInput }}" placeholder="for profit on sales" style="display:block;width:100%;margin-top:4px;border:1px solid #E2DACB;border-radius:7px;padding:7px 9px;"></label>
+            <label style="font-size:11px;color:#78716C;">Source / partner<input data-field="source" value="{{ form.source }}" onInput="{{ onFormInput }}" placeholder="Walk-in, Partner 3…" style="display:block;width:100%;margin-top:4px;border:1px solid #E2DACB;border-radius:7px;padding:7px 9px;"></label>
+            <label style="font-size:11px;color:#78716C;">Inclusions<input data-field="incl" value="{{ form.incl }}" onInput="{{ onFormInput }}" placeholder="Box, Papers, Manuals" style="display:block;width:100%;margin-top:4px;border:1px solid #E2DACB;border-radius:7px;padding:7px 9px;"></label>
+            <label style="font-size:11px;color:#78716C;grid-column:1/-1;">Notes<input data-field="notes" value="{{ form.notes }}" onInput="{{ onFormInput }}" placeholder="anything worth remembering" style="display:block;width:100%;margin-top:4px;border:1px solid #E2DACB;border-radius:7px;padding:7px 9px;"></label>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:14px;">
+            <button onClick="{{ saveRecord }}" style="background:#1C1917;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;">Save to archive</button>
+            <button onClick="{{ toggleForm }}" style="background:none;color:#78716C;border:1px solid #E2DACB;border-radius:8px;padding:9px 16px;font-size:13px;">Cancel</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <div style="font-size:12px;color:#78716C;margin-bottom:8px;">{{ archiveCountText }}</div>
+      <div class="wi-scroll" style="overflow:auto;max-height:560px;background:#fff;border:1px solid #EDE6DA;border-radius:12px;">
+        <table style="width:100%;min-width:820px;font-size:13px;">
+          <thead><tr>
+            <th style="position:sticky;top:0;text-align:left;padding:10px 14px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Date</th>
+            <th style="position:sticky;top:0;text-align:left;padding:10px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Kind</th>
+            <th style="position:sticky;top:0;text-align:left;padding:10px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Watch</th>
+            <th style="position:sticky;top:0;text-align:left;padding:10px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Ref</th>
+            <th style="position:sticky;top:0;text-align:left;padding:10px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Source</th>
+            <th style="position:sticky;top:0;text-align:left;padding:10px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Inclusions</th>
+            <th style="position:sticky;top:0;text-align:right;padding:10px 14px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Price</th>
+            <th style="position:sticky;top:0;padding:10px 8px;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;"></th>
+          </tr></thead>
+          <tbody>
+            <sc-for list="{{ archiveRows }}" as="r" hint-placeholder-count="4">
+              <tr>
+                <td style="text-align:left;padding:9px 14px;border-bottom:1px solid #F3EEE4;color:#78716C;font-variant-numeric:tabular-nums;white-space:nowrap;">{{ r.date }}</td>
+                <td style="text-align:left;padding:9px 12px;border-bottom:1px solid #F3EEE4;"><span style="{{ r.tagStyle }}">{{ r.kind }}</span></td>
+                <td style="text-align:left;padding:9px 12px;border-bottom:1px solid #F3EEE4;max-width:300px;"><div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ r.watch }}</div></td>
+                <td style="text-align:left;padding:9px 12px;border-bottom:1px solid #F3EEE4;color:#78716C;font-variant-numeric:tabular-nums;">{{ r.ref }}</td>
+                <td style="text-align:left;padding:9px 12px;border-bottom:1px solid #F3EEE4;color:#78716C;">{{ r.source }}</td>
+                <td style="text-align:left;padding:9px 12px;border-bottom:1px solid #F3EEE4;">
+                  <div style="display:flex;flex-wrap:wrap;gap:4px;">
+                    <sc-for list="{{ r.incl }}" as="c" hint-placeholder-count="1">
+                      <span style="display:inline-block;font-size:10px;padding:1px 6px;border-radius:4px;background:#F1EADD;color:#6b5318;white-space:nowrap;">{{ c }}</span>
+                    </sc-for>
+                  </div>
+                </td>
+                <td style="text-align:right;padding:9px 14px;border-bottom:1px solid #F3EEE4;font-weight:600;font-variant-numeric:tabular-nums;">{{ r.price }}</td>
+                <td style="text-align:center;padding:9px 8px;border-bottom:1px solid #F3EEE4;"><button onClick="{{ r.onDelete }}" title="Delete" style="background:none;border:none;color:#C4BCB0;font-size:15px;padding:2px 6px;">×</button></td>
+              </tr>
+            </sc-for>
+            <sc-if value="{{ archiveEmpty }}" hint-placeholder-val="{{ false }}">
+              <tr><td colspan="8" style="padding:30px;text-align:center;color:#A8A29E;font-size:13px;">No entries yet. Add a deal, or “Log today's market” to seed the book with current comps.</td></tr>
+            </sc-if>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    </sc-if>
+
+  </main>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1240,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  state = {
+    loading: true, error: null, data: null, mod: null, refreshing: false,
+    tab: 'overview', salesYear: null,
+    gentrySearch: '', gentrySort: 'value',
+    oneSearch: '', onePartner: 'all', oneSort: 'value',
+    archive: [], archiveSearch: '', showForm: false, lookupQuery: '',
+    form: this.blankForm(),
+  };
+
+  blankForm() {
+    const d = new Date(Date.now() + 8 * 3600 * 1000).toISOString().slice(0, 10);
+    return { kind: 'Bought', brand: '', model: '', ref: '', year: '', cond: '', price: '', cost: '', incl: '', date: d, source: '', notes: '' };
+  }
+
+  peso(n) {
+    if (n == null || isNaN(n)) return '—';
+    return '₱' + (n >= 1e9 ? (n / 1e9).toFixed(2) + 'B' : n >= 1e6 ? (n / 1e6).toFixed(2) + 'M' : n >= 1e3 ? (n / 1e3).toFixed(0) + 'K' : Math.round(n));
+  }
+  full(n) { return (n == null || isNaN(n)) ? '—' : '₱' + Math.round(n).toLocaleString(); }
+  normRef(s) { return (s || '').toUpperCase().replace(/[^0-9A-Z]/g, ''); }
+  partnerLabel(code) { return !code || code === 'Unassigned' ? 'Unassigned' : 'Partner ' + code; }
+
+  async componentDidMount() {
+    // load archive: localStorage merged over seed file
+    let arch = [];
+    try { const r = await fetch('./price-archive.json'); if (r.ok) arch = await r.json(); } catch (e) {}
+    try { const ls = JSON.parse(localStorage.getItem('wi_archive_v1')); if (Array.isArray(ls)) arch = ls; } catch (e) {}
+    this.setState({ archive: Array.isArray(arch) ? arch : [] });
+    this.load(false);
+  }
+
+  async load(force) {
+    this.setState({ refreshing: true, error: null });
+    try {
+      const mod = this.state.mod || await import(new URL('watch-data.js', location.href).href);
+      const data = await mod.fetchAll(force);
+      if (data.autoSold && data.autoSold.length) this.mergeAutoSold(data.autoSold);
+      this.setState({ mod, data, loading: false, refreshing: false });
+    } catch (e) {
+      this.setState({ error: String(e && e.message || e), loading: false, refreshing: false });
+    }
+  }
+  refresh = () => this.load(true);
+  setTab(t) { this.setState({ tab: t }); }
+
+  // ── archive persistence ──
+  persist(arch) { try { localStorage.setItem('wi_archive_v1', JSON.stringify(arch)); } catch (e) {} }
+  // merge inventory-disappearance sales detected by the data engine, deduped by source key
+  mergeAutoSold(list) {
+    const seen = new Set(this.state.archive.filter(r => r.srcKey).map(r => r.srcKey));
+    const add = list.filter(r => r.srcKey && !seen.has(r.srcKey));
+    if (!add.length) return;
+    const arch = [...add, ...this.state.archive];
+    this.persist(arch);
+    this.setState({ archive: arch });
+  }
+  saveRecord = () => {
+    const f = this.state.form;
+    if (!f.model && !f.ref && !f.brand) return;
+    const rec = {
+      id: 'r' + Date.now() + Math.random().toString(36).slice(2, 6),
+      kind: f.kind, brand: f.brand.trim(), model: f.model.trim(),
+      ref: f.ref.trim(), year: f.year.trim(), cond: f.cond.trim(),
+      price: f.price ? parseInt(String(f.price).replace(/[^0-9]/g, ''), 10) : null,
+      cost: f.cost ? parseInt(String(f.cost).replace(/[^0-9]/g, ''), 10) : null,
+      incl: f.incl ? f.incl.split(/[,/]+/).map(x => x.trim()).filter(Boolean) : [],
+      date: f.date, source: f.source.trim(), notes: f.notes.trim(),
+    };
+    const arch = [rec, ...this.state.archive];
+    this.persist(arch);
+    this.setState({ archive: arch, showForm: false, form: this.blankForm() });
+  };
+  deleteRecord(id) {
+    const arch = this.state.archive.filter(r => r.id !== id);
+    this.persist(arch);
+    this.setState({ archive: arch });
+  }
+  logMarket = () => {
+    const d = this.state.data; if (!d) return;
+    const day = new Date(Date.now() + 8 * 3600 * 1000).toISOString().slice(0, 10);
+    const existing = new Set(this.state.archive.map(r => r.id));
+    const mk = (w, src) => ({
+      id: 'm' + day + '|' + src + '|' + this.normRef(w.ref || w.name) + '|' + (w.price || 0),
+      kind: 'Asking', brand: w.brand || '', model: w.name || '', ref: w.ref || '',
+      year: w.year || '', cond: w.cond || '', price: w.price || null, cost: null,
+      incl: w.incl || [],
+      date: day, source: src + (w.partner ? ' · Partner ' + w.partner : ''), notes: 'auto market snapshot',
+    });
+    const fresh = [];
+    d.gentry.forEach(w => { if (w.price) fresh.push(mk(w, 'Gentry')); });
+    d.onetime.forEach(w => { if (w.price) fresh.push(mk(w, '1TimePiece')); });
+    const dedup = fresh.filter(r => !existing.has(r.id));
+    const arch = [...dedup, ...this.state.archive];
+    this.persist(arch);
+    this.setState({ archive: arch });
+  };
+  clearArchive = () => { if (confirm('Erase the entire archive? Export first if unsure.')) { this.persist([]); this.setState({ archive: [] }); } };
+
+  download(name, text, type) {
+    const blob = new Blob([text], { type });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  }
+  exportJSON = () => this.download('price-archive.json', JSON.stringify(this.state.archive, null, 2), 'application/json');
+  exportCSV = () => {
+    const cols = ['date', 'kind', 'brand', 'model', 'ref', 'year', 'cond', 'incl', 'price', 'cost', 'source', 'notes'];
+    const esc = v => '"' + String(v == null ? '' : (Array.isArray(v) ? v.join(' / ') : v)).replace(/"/g, '""') + '"';
+    const rows = [cols.join(',')].concat(this.state.archive.map(r => cols.map(c => esc(r[c])).join(',')));
+    this.download('price-archive.csv', rows.join('\n'), 'text/csv');
+  };
+  importJSON = (e) => {
+    const file = e.target.files && e.target.files[0]; if (!file) return;
+    const fr = new FileReader();
+    fr.onload = () => {
+      try {
+        const arr = JSON.parse(fr.result);
+        if (Array.isArray(arr)) {
+          const byId = {}; [...arr, ...this.state.archive].forEach(r => { if (r && r.id) byId[r.id] = r; });
+          const merged = Object.values(byId);
+          this.persist(merged); this.setState({ archive: merged });
+        }
+      } catch (err) { alert('Could not read that file.'); }
+    };
+    fr.readAsText(file);
+  };
+
+  // ── input handlers ──
+  onFormInput = (e) => { const f = e.target.dataset.field; this.setState({ form: { ...this.state.form, [f]: e.target.value } }); };
+  toggleForm = () => this.setState({ showForm: !this.state.showForm });
+
+  navStyle(id) {
+    const a = this.state.tab === id;
+    return 'padding:6px 1px;background:none;border:none;font-size:14px;color:' + (a ? '#1C1917' : '#78716C') +
+      ';border-bottom:2px solid ' + (a ? '#B08D3E' : 'transparent') + ';font-weight:' + (a ? '600' : '400') + ';white-space:nowrap;';
+  }
+
+  partnerColor(code) {
+    const map = { '1': '#B08D3E', '2': '#1D4ED8', '3': '#9F1239', '4': '#3F6212', '5': '#7C3AED', '6': '#0E7490' };
+    return map[code] || '#A8A29E';
+  }
+
+  filterSort(items, search, sort) {
+    const q = (search || '').trim().toLowerCase();
+    let arr = items;
+    if (q) arr = items.filter(w => (w.name + ' ' + (w.ref || '') + ' ' + w.brand).toLowerCase().includes(q));
+    const v = w => (w.price == null ? -1 : w.price);
+    arr = arr.slice();
+    if (sort === 'value') arr.sort((a, b) => v(b) - v(a));
+    else if (sort === 'value_asc') arr.sort((a, b) => v(a) - v(b));
+    else if (sort === 'name') arr.sort((a, b) => a.name.localeCompare(b.name));
+    else if (sort === 'brand') arr.sort((a, b) => a.brand.localeCompare(b.brand) || v(b) - v(a));
+    else if (sort === 'year') arr.sort((a, b) => (b.year || '').localeCompare(a.year || ''));
+    return arr;
+  }
+
+  comps(query) {
+    const q = (query || '').trim().toLowerCase();
+    if (!q) return [];
+    const nq = this.normRef(query);
+    const match = (name, ref) => {
+      const hay = (name || '').toLowerCase();
+      if (hay.includes(q)) return true;
+      if (nq.length >= 3 && this.normRef(ref).includes(nq)) return true;
+      return false;
+    };
+    const out = [];
+    const d = this.state.data;
+    if (d) {
+      d.gentry.forEach(w => { if (w.price && match(w.name, w.ref)) out.push({ name: w.name, tag: 'Gentry', date: 'live', price: w.price }); });
+      d.onetime.forEach(w => { if (w.price && match(w.name, w.ref)) out.push({ name: w.name, tag: '1TP' + (w.partner ? ' P' + w.partner : ''), date: 'live', price: w.price }); });
+    }
+    this.state.archive.forEach(r => { if (r.price && match(r.model + ' ' + r.brand, r.ref)) out.push({ name: (r.brand + ' ' + r.model).trim(), tag: r.kind, date: r.date, price: r.price }); });
+    return out;
+  }
+
+  tagStyle(tag) {
+    const base = 'display:inline-block;font-size:10px;padding:2px 7px;border-radius:99px;letter-spacing:.02em;white-space:nowrap;';
+    const m = {
+      Bought: 'background:#DCEAD0;color:#3F6212;', Sold: 'background:#FCE7EB;color:#9F1239;',
+      Offer: 'background:#E0E7FF;color:#3730A3;', Asking: 'background:#EFE7D5;color:#6b5318;',
+      Gentry: 'background:#EFE7D5;color:#6b5318;',
+    };
+    let key = tag; if (tag && tag.startsWith('1TP')) key = 'Asking';
+    return base + (m[key] || 'background:#EFE7D5;color:#6b5318;');
+  }
+
+  renderVals() {
+    const s = this.state;
+    const navOverview = this.navStyle('overview'), navGentry = this.navStyle('gentry'),
+      navOnetime = this.navStyle('onetime'), navSales = this.navStyle('sales'), navArchive = this.navStyle('archive');
+    const base = {
+      navOverview, navGentry, navOnetime, navSales, navArchive,
+      goOverview: () => this.setTab('overview'), goGentry: () => this.setTab('gentry'),
+      goOnetime: () => this.setTab('onetime'), goSales: () => this.setTab('sales'), goArchive: () => this.setTab('archive'),
+      refresh: this.refresh,
+      refreshLabel: s.refreshing ? 'Refreshing…' : 'Refresh',
+      spinStyle: 'display:inline-block;' + (s.refreshing ? 'animation:wi-spin .8s linear infinite;' : ''),
+      showLoading: s.loading && !s.data, showError: !!s.error && !s.data, errorMsg: s.error || '',
+      stale: !!(s.data && s.data.stale),
+      showOverview: false, showGentry: false, showOnetime: false, showSales: s.tab === 'sales', showArchive: s.tab === 'archive',
+      updatedText: s.data ? ('Updated ' + s.data.generatedAt + ' PHT · auto-refresh 6h') : 'Loading…',
+    };
+    // archive + sales views are computable from the archive alone (no market data needed)
+    Object.assign(base, this.archiveVals());
+    Object.assign(base, this.salesVals());
+
+    if (!s.data) return base;
+    const d = s.data, ag = d.agg;
+    const showContent = !s.loading;
+    base.showOverview = showContent && s.tab === 'overview';
+    base.showGentry = showContent && s.tab === 'gentry';
+    base.showOnetime = showContent && s.tab === 'onetime';
+
+    // KPIs
+    base.overviewKpis = [
+      { label: 'Combined value', value: this.peso(ag.gentry.value + ag.onetime.value), delta: (ag.gentry.count + ag.onetime.count) + ' pieces tracked' },
+      { label: 'Gentry stock', value: this.peso(ag.gentry.value), delta: ag.gentry.count + ' watches' },
+      { label: '1TimePiece stock', value: this.peso(ag.onetime.value), delta: ag.onetime.count + ' watches' },
+      { label: 'Partners', value: String(ag.onetime.byPartner.length), delta: ag.onetime.byBrand.length + ' brands listed' },
+    ];
+    base.sourceRows = [
+      { name: 'Gentry Timepieces', count: ag.gentry.count.toLocaleString(), value: this.full(ag.gentry.value), avg: this.peso(ag.gentry.avg), brands: ag.gentry.byBrand.length, note: 'own retail' },
+      { name: '1TimePiece', count: ag.onetime.count.toLocaleString(), value: this.full(ag.onetime.value), avg: this.peso(ag.onetime.avg), brands: ag.onetime.byBrand.length, note: ag.onetime.held + ' on hold · ' + ag.onetime.byPartner.length + ' partners' },
+    ];
+
+    const barRows = (list, color) => {
+      const max = list.reduce((m, x) => Math.max(m, x.v), 1);
+      return list.map(x => ({
+        key: x.key, n: x.n, vshort: this.peso(x.v),
+        barStyle: 'height:100%;border-radius:99px;background:' + color + ';width:' + Math.max(2, (x.v / max) * 100) + '%;',
+      }));
+    };
+    base.gBrandRows = barRows(ag.gentry.byBrand, '#B08D3E');
+    base.oBrandRows = barRows(ag.onetime.byBrand, '#1C1917');
+
+    // history bars
+    const hist = (s.mod ? s.mod.getHistory() : []) || [];
+    base.hasHistory = hist.length > 1;
+    base.noHistory = hist.length <= 1;
+    if (hist.length > 1) {
+      const maxv = hist.reduce((m, h) => Math.max(m, h.gv + h.ov), 1);
+      const recent = hist.slice(-14);
+      base.historyBars = recent.map(h => {
+        const tot = h.gv + h.ov;
+        return {
+          label: h.d.slice(5), title: h.d + ' · ' + this.full(tot),
+          barStyle: 'width:100%;border-radius:5px 5px 0 0;background:linear-gradient(#C9A752,#B08D3E);height:' + Math.max(4, (tot / maxv) * 120) + 'px;',
+        };
+      });
+    } else base.historyBars = [];
+
+    // Gentry tab
+    base.gentryKpis = [
+      { label: 'Inventory value', value: this.peso(ag.gentry.value), delta: this.full(ag.gentry.value) },
+      { label: 'Watches in stock', value: ag.gentry.count.toLocaleString(), delta: ag.gentry.byBrand.length + ' brands' },
+      { label: 'Average ticket', value: this.peso(ag.gentry.avg), delta: 'per watch' },
+      { label: 'Top brand', value: ag.gentry.byBrand[0] ? ag.gentry.byBrand[0].key : '—', delta: ag.gentry.byBrand[0] ? this.peso(ag.gentry.byBrand[0].v) : '' },
+    ];
+    const gl = this.filterSort(ag.gentry.items, s.gentrySearch, s.gentrySort);
+    base.gCount = gl.length;
+    base.gentrySearch = s.gentrySearch; base.gentrySort = s.gentrySort;
+    base.onGentrySearch = e => this.setState({ gentrySearch: e.target.value });
+    base.onGentrySort = e => this.setState({ gentrySort: e.target.value });
+    base.gListings = gl.slice(0, 400).map(w => ({
+      name: w.name, brand: w.brand, ref: w.ref || '—', year: w.year || '—',
+      incl: w.incl || [],
+      price: this.full(w.price), url: w.url, img: w.img || '',
+    }));
+
+    // 1TimePiece tab
+    base.onetimeKpis = [
+      { label: 'Inventory value', value: this.peso(ag.onetime.value), delta: this.full(ag.onetime.value) },
+      { label: 'Watches listed', value: ag.onetime.count.toLocaleString(), delta: ag.onetime.held + ' on hold' },
+      { label: 'Average ticket', value: this.peso(ag.onetime.avg), delta: 'per watch' },
+      { label: 'Partners', value: String(ag.onetime.byPartner.length), delta: 'consignors' },
+      { label: 'Top partner', value: ag.onetime.byPartner[0] ? this.partnerLabel(ag.onetime.byPartner[0].key) : '—', delta: ag.onetime.byPartner[0] ? this.peso(ag.onetime.byPartner[0].v) : '' },
+    ];
+    const ptot = ag.onetime.value || 1;
+    const pmax = ag.onetime.byPartner.reduce((m, x) => Math.max(m, x.v), 1);
+    base.partnerRows = ag.onetime.byPartner.map(p => {
+      const code = p.key === 'Unassigned' ? '' : p.key;
+      const col = this.partnerColor(code);
+      return {
+        label: this.partnerLabel(p.key), n: p.n, value: this.full(p.v), avg: this.peso(p.n ? p.v / p.n : 0),
+        share: ((p.v / ptot) * 100).toFixed(1) + '%',
+        rowStyle: '',
+        dotStyle: 'display:inline-block;width:8px;height:8px;border-radius:50%;background:' + col + ';margin-right:8px;vertical-align:middle;',
+        barStyle: 'height:100%;border-radius:99px;background:' + col + ';width:' + Math.max(2, (p.v / pmax) * 100) + '%;',
+      };
+    });
+    base.partnerOptions = [{ v: 'all', t: 'All partners' }].concat(
+      ag.onetime.byPartner.map(p => ({ v: p.key, t: this.partnerLabel(p.key) + ' (' + p.n + ')' })));
+    base.onePartner = s.onePartner; base.oneSearch = s.oneSearch; base.oneSort = s.oneSort;
+    base.onOneSearch = e => this.setState({ oneSearch: e.target.value });
+    base.onOnePartner = e => this.setState({ onePartner: e.target.value });
+    base.onOneSort = e => this.setState({ oneSort: e.target.value });
+    let oitems = ag.onetime.items;
+    if (s.onePartner !== 'all') oitems = oitems.filter(w => (w.partner || 'Unassigned') === s.onePartner);
+    const ol = this.filterSort(oitems, s.oneSearch, s.oneSort);
+    base.oCount = ol.length;
+    base.oListings = ol.slice(0, 500).map(w => {
+      const code = w.partner || '';
+      return {
+        name: w.name, brand: w.brand, ref: w.ref || '—',
+        partnerLabel: code ? 'P' + code : '—',
+        partnerStyle: code ? ('display:inline-block;min-width:26px;font-size:11px;font-weight:600;padding:2px 7px;border-radius:99px;color:#fff;background:' + this.partnerColor(code) + ';') : 'color:#C4BCB0;',
+        incl: w.incl || [],
+        price: w.status ? w.status : this.full(w.price),
+      };
+    });
+
+    return base;
+  }
+
+  archiveVals() {
+    const s = this.state;
+    const v = {
+      showForm: s.showForm, form: s.form, archiveSearch: s.archiveSearch, lookupQuery: s.lookupQuery,
+      toggleForm: this.toggleForm, onFormInput: this.onFormInput, saveRecord: this.saveRecord,
+      logMarket: this.logMarket, exportJSON: this.exportJSON, exportCSV: this.exportCSV, importJSON: this.importJSON,
+      onArchiveSearch: e => this.setState({ archiveSearch: e.target.value }),
+      onLookup: e => this.setState({ lookupQuery: e.target.value }),
+    };
+    // archive table
+    const q = (s.archiveSearch || '').trim().toLowerCase();
+    let rows = s.archive;
+    if (q) rows = rows.filter(r => ((r.brand || '') + ' ' + (r.model || '') + ' ' + (r.ref || '') + ' ' + (r.source || '') + ' ' + (r.kind || '')).toLowerCase().includes(q));
+    v.archiveEmpty = rows.length === 0;
+    v.archiveCountText = s.archive.length + ' entries' + (q ? ' · ' + rows.length + ' shown' : '') + ' · saved in this browser';
+    v.archiveRows = rows.slice(0, 600).map(r => ({
+      date: r.date || '—', kind: r.kind || '—', tagStyle: this.tagStyle(r.kind),
+      watch: ((r.brand || '') + ' ' + (r.model || '')).trim() || '—', ref: r.ref || '—',
+      source: r.source || '—', price: this.full(r.price),
+      incl: Array.isArray(r.incl) ? r.incl : (r.incl ? [r.incl] : []),
+      onDelete: () => this.deleteRecord(r.id),
+    }));
+
+    // lookup / deal check
+    const comps = this.comps(s.lookupQuery);
+    v.hasLookup = comps.length > 0;
+    v.lookupEmpty = !!(s.lookupQuery.trim()) && comps.length === 0;
+    if (comps.length) {
+      const prices = comps.map(c => c.price).sort((a, b) => a - b);
+      const min = prices[0], max = prices[prices.length - 1];
+      const med = prices[Math.floor(prices.length / 2)];
+      const lows = comps.filter(c => c.tag === 'Gentry' || (c.tag || '').startsWith('1TP')).map(c => c.price);
+      const lowestAsk = lows.length ? Math.min(...lows) : min;
+      v.lowestAsk = this.full(lowestAsk);
+      v.lookupCount = comps.length;
+      v.lookupStats = [
+        { label: 'Lowest', value: this.peso(min), sub: 'cheapest comp', color: '#7FB069' },
+        { label: 'Median', value: this.peso(med), sub: 'typical', color: '#fff' },
+        { label: 'Highest', value: this.peso(max), sub: 'top ask', color: '#E89B9B' },
+        { label: 'Comps', value: String(comps.length), sub: 'data points', color: '#D8B978' },
+      ];
+      v.buyTiers = [10, 15, 20].map(m => ({ label: m + '%', price: this.full(Math.round(lowestAsk / (1 + m / 100))) }));
+      v.lookupRows = comps.sort((a, b) => a.price - b.price).slice(0, 40).map(c => ({
+        name: c.name, tag: c.tag, tagStyle: this.tagStyle(c.tag), date: c.date, price: this.full(c.price),
+      }));
+    } else {
+      v.lookupStats = []; v.buyTiers = []; v.lookupRows = []; v.lowestAsk = '—'; v.lookupCount = 0;
+    }
+    return v;
+  }
+
+  salesVals() {
+    const s = this.state;
+    const MN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const now = new Date(Date.now() + 8 * 3600 * 1000);
+    const curY = now.getUTCFullYear(), curM = now.getUTCMonth() + 1;
+    const ym = d => { const m = /^(\d{4})-(\d{2})/.exec(d || ''); return m ? { y: +m[1], mo: +m[2] } : null; };
+    const sales = s.archive.filter(r => r.kind === 'Sold');
+    const selYear = s.salesYear || curY;
+
+    // year selector — known sale years plus a rolling current→+2 window
+    const yset = new Set([curY - 1, curY, curY + 1, curY + 2]);
+    sales.forEach(r => { const p = ym(r.date); if (p) yset.add(p.y); });
+    const yearsArr = [...yset].sort((a, b) => a - b);
+
+    const months = Array.from({ length: 12 }, () => ({ v: 0, n: 0, profit: 0, cost: 0 }));
+    let yrRev = 0, yrUnits = 0, yrProfit = 0, yrCostKnown = 0;
+    let mtdRev = 0, mtdN = 0, ytdRev = 0, ytdN = 0;
+    sales.forEach(r => {
+      const p = ym(r.date); if (!p) return;
+      const price = r.price || 0;
+      const cost = (r.cost != null && r.cost !== '') ? (+r.cost || 0) : null;
+      if (p.y === selYear) {
+        const mm = months[p.mo - 1]; mm.v += price; mm.n++;
+        yrRev += price; yrUnits++;
+        if (cost != null) { yrProfit += price - cost; yrCostKnown++; }
+      }
+      if (p.y === curY) { ytdRev += price; ytdN++; if (p.mo === curM) { mtdRev += price; mtdN++; } }
+    });
+    const maxv = months.reduce((m, x) => Math.max(m, x.v), 1);
+
+    const v = {};
+    const plural = n => n === 1 ? ' sale' : ' sales';
+    v.salesKpis = [
+      { label: 'Month to date', value: this.peso(mtdRev), delta: mtdN + plural(mtdN) + ' · ' + MN[curM - 1] + ' ' + curY, color: '#1C1917' },
+      { label: 'Year to date', value: this.peso(ytdRev), delta: ytdN + plural(ytdN) + ' · ' + curY, color: '#1C1917' },
+      { label: selYear + ' units sold', value: String(yrUnits), delta: 'watches', color: '#1C1917' },
+      { label: selYear + ' avg sale', value: yrUnits ? this.peso(yrRev / yrUnits) : '—', delta: 'per watch', color: '#1C1917' },
+      { label: selYear + ' profit', value: yrCostKnown ? this.peso(yrProfit) : '—', delta: yrCostKnown ? (yrCostKnown + ' with cost logged') : 'log cost to track', color: yrCostKnown ? (yrProfit >= 0 ? '#3F6212' : '#9F1239') : '#A8A29E' },
+    ];
+    v.monthBars = months.map((mm, i) => {
+      const active = (selYear === curY && i + 1 === curM);
+      const col = mm.v ? (active ? 'linear-gradient(#C9A752,#B08D3E)' : 'linear-gradient(#DcCfa9,#BBA877)') : '#EDE6DA';
+      return {
+        label: MN[i], valLabel: mm.v ? this.peso(mm.v) : '',
+        title: MN[i] + ' ' + selYear + ' · ' + this.full(mm.v) + ' · ' + mm.n + plural(mm.n),
+        barStyle: 'width:100%;border-radius:5px 5px 0 0;background:' + col + ';height:' + Math.max(2, (mm.v / maxv) * 120) + 'px;',
+      };
+    });
+    v.salesYearLabel = String(selYear);
+    v.salesYears = yearsArr.map(y => ({
+      label: String(y),
+      onClick: () => this.setState({ salesYear: y }),
+      style: 'background:' + (y === selYear ? '#1C1917' : '#fff') + ';color:' + (y === selYear ? '#fff' : '#57534E') + ';border:1px solid ' + (y === selYear ? '#1C1917' : '#E2DACB') + ';border-radius:8px;padding:6px 12px;font-size:12.5px;font-weight:600;',
+    }));
+
+    const yrSales = sales.filter(r => { const p = ym(r.date); return p && p.y === selYear; }).sort((a, b) => (a.date < b.date ? 1 : -1));
+    v.salesCount = yrSales.length;
+    v.salesEmpty = yrSales.length === 0;
+    const autoN = yrSales.filter(r => r.auto).length;
+    v.salesHasAuto = autoN > 0;
+    v.salesAutoNote = autoN + (autoN === 1 ? ' sale was' : ' sales were') + ' auto-detected from Gentry / 1TimePiece inventory changes — set the cost on each to track profit.';
+    v.saleRows = yrSales.slice(0, 600).map(r => {
+      const cost = (r.cost != null && r.cost !== '') ? (+r.cost || 0) : null;
+      const profit = cost != null ? (r.price || 0) - cost : null;
+      return {
+        date: r.date || '—', watch: r.model || ((r.brand || '') + ' watch'), brand: r.brand || '—', ref: r.ref || '—',
+        incl: Array.isArray(r.incl) ? r.incl : (r.incl ? [r.incl] : []),
+        channel: r.source || '—', price: this.full(r.price), cost: cost != null ? this.full(cost) : '—',
+        auto: !!r.auto,
+        profit: profit != null ? this.full(profit) : '—',
+        profitStyle: 'text-align:right;padding:9px 14px;border-bottom:1px solid #F3EEE4;font-weight:600;font-variant-numeric:tabular-nums;color:' + (profit == null ? '#A8A29E' : (profit >= 0 ? '#3F6212' : '#9F1239')) + ';',
+      };
+    });
+    v.goLogSale = () => this.setState({ tab: 'archive', showForm: true, form: { ...this.blankForm(), kind: 'Sold' } });
+    return v;
+  }
+}
+</script>
+</body>
+</html>
