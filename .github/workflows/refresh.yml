@@ -1,0 +1,38 @@
+name: Refresh Watch Intel data
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'   # every 6 hours (UTC)
+  workflow_dispatch: {}      # allow manual "Run workflow" from the Actions tab
+
+permissions:
+  contents: write            # lets the job commit the refreshed data back
+
+concurrency:
+  group: refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Fetch inventory + detect sales
+        run: node scripts/refresh.mjs
+
+      - name: Commit updated data
+        run: |
+          git config user.name  "watch-intel-bot"
+          git config user.email "actions@github.com"
+          git add data/
+          if git diff --cached --quiet; then
+            echo "No changes."
+          else
+            git commit -m "data: refresh $(date -u +'%Y-%m-%d %H:%M UTC')"
+            git push
+          fi
