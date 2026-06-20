@@ -351,6 +351,27 @@ function readLive() { try { return JSON.parse(localStorage.getItem(LIVE_KEY)); }
 
 /* Main entry. Returns { agg, gentry, onetime, generatedAt, fromCache, failed, ageMs, stale } */
 export async function fetchAll(force = false) {
+  // Option B: prefer the snapshot the GitHub Action committed (server-side source of truth).
+  // The live-fetch path below stays as the fallback if no snapshot is present.
+  try {
+    const r = await fetch('./data/snapshot.json?_=' + Date.now());
+    if (r.ok) {
+      const snap = await r.json();
+      if (snap && snap.agg && snap.agg.gentry && snap.agg.onetime) {
+        let autoSold = [];
+        try { const s = await fetch('./data/sales.json?_=' + Date.now()); if (s.ok) autoSold = await s.json(); } catch {}
+        try { recordHistory(snap.agg); } catch {}
+        return {
+          ...snap,
+          gentry: snap.agg.gentry.items || [],
+          onetime: snap.agg.onetime.items || [],
+          autoSold,
+          fromCache: false, ageMs: 0, stale: false, server: true,
+        };
+      }
+    }
+  } catch {}
+
   const cached = readCache();
   if (!force && cached && Date.now() - cached.at < TTL_MS) {
     return { ...cached.payload, fromCache: true, ageMs: Date.now() - cached.at, stale: false };
