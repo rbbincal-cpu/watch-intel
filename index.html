@@ -82,8 +82,38 @@
             <div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#78716C;">{{ k.label }}</div>
             <div style="font-family:'Playfair Display',serif;font-size:27px;margin-top:5px;line-height:1.1;">{{ k.value }}</div>
             <div style="font-size:12px;color:#78716C;margin-top:3px;">{{ k.delta }}</div>
+            <div style="font-size:11.5px;font-weight:600;margin-top:5px;color:{{ k.changeColor }};">{{ k.change }}</div>
           </div>
         </sc-for>
+      </div>
+
+      <h3 style="font-family:'Playfair Display',serif;font-size:17px;font-weight:600;margin:0 0 10px;">Recent activity</h3>
+      <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:18px;margin-bottom:30px;" class="wi-cols">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;align-content:start;">
+          <sc-for list="{{ overviewActivityCards }}" as="k" hint-placeholder-count="4">
+            <div style="background:#fff;border:1px solid #EDE6DA;border-radius:12px;padding:14px 16px;">
+              <div style="font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:#78716C;">{{ k.label }}</div>
+              <div style="font-family:'Playfair Display',serif;font-size:21px;margin-top:4px;line-height:1.1;">{{ k.value }}</div>
+              <div style="font-size:11.5px;color:#78716C;margin-top:3px;">{{ k.delta }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="background:#fff;border:1px solid #EDE6DA;border-radius:12px;padding:14px 16px;">
+          <div style="font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:#78716C;margin-bottom:8px;">Latest sales</div>
+          <sc-if value="{{ overviewHasSales }}" hint-placeholder-val="{{ false }}">
+            <sc-for list="{{ overviewLatestSales }}" as="r" hint-placeholder-count="5">
+              <div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #F3EEE4;">
+                <div style="font-size:11px;color:#A8A29E;font-variant-numeric:tabular-nums;white-space:nowrap;width:62px;">{{ r.date }}</div>
+                <div style="flex:1;min-width:0;font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ r.title }}</div>
+                <div style="font-size:11px;color:#78716C;white-space:nowrap;">{{ r.channel }}</div>
+                <div style="font-size:12.5px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap;">{{ r.price }}</div>
+              </div>
+            </sc-for>
+          </sc-if>
+          <sc-if value="{{ overviewNoSales }}" hint-placeholder-val="{{ false }}">
+            <div style="color:#A8A29E;font-size:12.5px;padding:14px 0;text-align:center;">No sales recorded yet.</div>
+          </sc-if>
+        </div>
       </div>
 
       <h3 style="font-family:'Playfair Display',serif;font-size:17px;font-weight:600;margin:0 0 10px;">Sources side by side</h3>
@@ -825,17 +855,55 @@ class Component extends DCLogic {
     base.showGentry = showContent && s.tab === 'gentry';
     base.showOnetime = showContent && s.tab === 'onetime';
 
-    // KPIs
+    // KPIs — with day-over-day deltas vs the latest committed history day before today
+    const histAll = (s.mod ? s.mod.getHistory() : []) || [];
+    const todayStr = new Date(Date.now() + 8 * 3600 * 1000).toISOString().slice(0, 10);
+    const baseRow = histAll.filter(h => h && h.d && h.d < todayStr).slice(-1)[0] || null;
+    const chg = (nowV, wasV) => {
+      if (wasV == null || !isFinite(wasV) || !baseRow) return { change: '', changeColor: '#A8A29E' };
+      const diff = nowV - wasV;
+      if (!diff) return { change: 'no change vs ' + baseRow.d.slice(5), changeColor: '#A8A29E' };
+      return { change: (diff > 0 ? '▲ ' : '▼ ') + this.peso(Math.abs(diff)) + ' vs ' + baseRow.d.slice(5), changeColor: diff > 0 ? '#3F6212' : '#9F1239' };
+    };
+    const combinedNow = ag.gentry.value + ag.onetime.value;
     base.overviewKpis = [
-      { label: 'Combined value', value: this.peso(ag.gentry.value + ag.onetime.value), delta: (ag.gentry.count + ag.onetime.count) + ' pieces tracked' },
-      { label: 'Gentry stock', value: this.peso(ag.gentry.value), delta: ag.gentry.count + ' watches' },
-      { label: '1TimePiece stock', value: this.peso(ag.onetime.value), delta: ag.onetime.count + ' watches' },
-      { label: 'Partners', value: String(ag.onetime.byPartner.length), delta: ag.onetime.byBrand.length + ' brands listed' },
+      { label: 'Combined value', value: this.peso(combinedNow), delta: (ag.gentry.count + ag.onetime.count) + ' pieces tracked', ...chg(combinedNow, baseRow ? baseRow.gv + baseRow.ov : null) },
+      { label: 'Gentry stock', value: this.peso(ag.gentry.value), delta: ag.gentry.count + ' watches', ...chg(ag.gentry.value, baseRow ? baseRow.gv : null) },
+      { label: '1TimePiece stock', value: this.peso(ag.onetime.value), delta: ag.onetime.count + ' watches', ...chg(ag.onetime.value, baseRow ? baseRow.ov : null) },
+      { label: 'Partners', value: String(ag.onetime.byPartner.length), delta: ag.onetime.byBrand.length + ' brands listed', change: '', changeColor: '#A8A29E' },
     ];
     base.sourceRows = [
       { name: 'Gentry Timepieces', count: ag.gentry.count.toLocaleString(), value: this.full(ag.gentry.value), avg: this.peso(ag.gentry.avg), brands: ag.gentry.byBrand.length, note: 'own retail' },
       { name: '1TimePiece', count: ag.onetime.count.toLocaleString(), value: this.full(ag.onetime.value), avg: this.peso(ag.onetime.avg), brands: ag.onetime.byBrand.length, note: ag.onetime.held + ' on hold · ' + ag.onetime.byPartner.length + ' partners' },
     ];
+
+    // Cockpit — recent sales activity + sell-through (uses the shared sales ledger)
+    const soldAll = (s.archive || []).filter(r => r.kind === 'Sold');
+    const dayMs = 86400000, tnow = Date.now();
+    const parseD = d => { const t = Date.parse((d || '') + 'T00:00:00+08:00'); return isNaN(t) ? null : t; };
+    const sumP = arr => arr.reduce((a, r) => a + (r.price || 0), 0);
+    const win = days => soldAll.filter(r => { const t = parseD(r.date); return t != null && (tnow - t) <= days * dayMs; });
+    const w7 = win(7), w30 = win(30);
+    const cmNow = new Date(Date.now() + 8 * 3600 * 1000), cmY = cmNow.getUTCFullYear(), cmM = cmNow.getUTCMonth() + 1;
+    const wmtd = soldAll.filter(r => { const m = /^(\d{4})-(\d{2})/.exec(r.date || ''); return m && +m[1] === cmY && +m[2] === cmM; });
+    const invCount = ag.gentry.count + ag.onetime.count;
+    const st30 = (invCount + w30.length) ? Math.round((w30.length / (invCount + w30.length)) * 100) : 0;
+    const sLbl = n => n + (n === 1 ? ' sale' : ' sales');
+    base.overviewActivityCards = [
+      { label: 'Sold · 7 days', value: this.peso(sumP(w7)), delta: sLbl(w7.length) },
+      { label: 'Sold · 30 days', value: this.peso(sumP(w30)), delta: sLbl(w30.length) },
+      { label: 'Sold · MTD', value: this.peso(sumP(wmtd)), delta: sLbl(wmtd.length) },
+      { label: 'Sell-through · 30d', value: st30 + '%', delta: 'of listed + sold' },
+    ];
+    const latest = soldAll.slice().sort((a, b) => (a.date < b.date ? 1 : -1)).slice(0, 6);
+    base.overviewHasSales = latest.length > 0;
+    base.overviewNoSales = latest.length === 0;
+    base.overviewLatestSales = latest.map(r => ({
+      date: r.date || '—',
+      title: (r.brand ? r.brand + ' ' : '') + (r.model || 'watch'),
+      channel: r.source || '—',
+      price: this.full(r.price),
+    }));
 
     const barRows = (list, color) => {
       const max = list.reduce((m, x) => Math.max(m, x.v), 1);

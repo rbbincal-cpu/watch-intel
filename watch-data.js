@@ -273,6 +273,17 @@ const nowPHT = () => {
 export function getHistory() {
   try { return JSON.parse(localStorage.getItem(HIST_KEY)) || []; } catch { return []; }
 }
+// Merge the server-committed history (data/history.json) into local history so day-over-day
+// deltas + the trend chart are real and shared across devices (Option B). Server rows are the
+// base; a same-day local row wins (it's the freshest seen in-browser).
+function mergeServerHistory(serverRows) {
+  if (!Array.isArray(serverRows) || !serverRows.length) return;
+  const byDate = {};
+  serverRows.forEach(r => { if (r && r.d) byDate[r.d] = r; });
+  getHistory().forEach(r => { if (r && r.d) byDate[r.d] = r; });
+  const merged = Object.values(byDate).sort((a, b) => (a.d < b.d ? -1 : 1)).slice(-180);
+  try { localStorage.setItem(HIST_KEY, JSON.stringify(merged)); } catch {}
+}
 function recordHistory(agg) {
   const hist = getHistory();
   const day = todayPHT();
@@ -360,6 +371,7 @@ export async function fetchAll(force = false) {
       if (snap && snap.agg && snap.agg.gentry && snap.agg.onetime) {
         let autoSold = [];
         try { const s = await fetch('./data/sales.json?_=' + Date.now()); if (s.ok) autoSold = await s.json(); } catch {}
+        try { const h = await fetch('./data/history.json?_=' + Date.now()); if (h.ok) mergeServerHistory(await h.json()); } catch {}
         try { recordHistory(snap.agg); } catch {}
         return {
           ...snap,
