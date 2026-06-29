@@ -1,1162 +1,802 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<script src="./support.js"></script>
-</head>
-<body>
-<x-dc>
-<helmet>
+<meta name="robots" content="noindex, nofollow">
+<title>Watch Intel · Luxury Watch Market Intelligence</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <style>
-  *{box-sizing:border-box;}
-  body{margin:0;background:#FAF6F0;color:#1C1917;font-family:'Inter',-apple-system,sans-serif;font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;}
-  button{font-family:inherit;cursor:pointer;}
-  input,select,textarea{font-family:inherit;font-size:13px;}
-  ::placeholder{color:#A8A29E;}
-  a{color:inherit;text-decoration:none;}
-  table{border-collapse:collapse;}
-  @keyframes wi-spin{to{transform:rotate(360deg);}}
-  @keyframes wi-fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
-  .wi-scroll::-webkit-scrollbar{height:9px;width:9px;}
-  .wi-scroll::-webkit-scrollbar-thumb{background:#DDD3C2;border-radius:99px;}
+:root{
+  --bg:#FAF6F0; --card:#FFFFFF; --ink:#1C1917; --muted:#78716C; --gold:#B08D3E;
+  --gold-light:#E5D5B0; --line:#EDE6DA; --green:#3F6212; --red:#9F1239; --mine:#FDF6E9;
+  --ink2:#221E1A;
+}
+*{box-sizing:border-box;margin:0;}
+body{background:var(--bg);color:var(--ink);font-family:'Inter',-apple-system,sans-serif;font-size:15px;line-height:1.5;}
+h1,h2,h3,.serif{font-family:'Playfair Display',Georgia,serif;font-weight:600;}
+a{color:inherit;}
+header{border-bottom:1px solid var(--line);background:var(--card);padding:16px 20px;position:sticky;top:0;z-index:20;}
+.header-inner{max-width:1240px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:8px 24px;}
+header h1{font-size:22px;letter-spacing:.02em;}
+header h1 .accent{color:var(--gold);}
+header .tagline{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);}
+nav{display:flex;gap:6px;font-size:14px;flex-wrap:wrap;}
+nav button{background:none;border:none;font:inherit;color:var(--muted);padding:6px 2px;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;}
+nav button.active{color:var(--ink);border-bottom-color:var(--gold);font-weight:600;}
+.right{margin-left:auto;display:flex;align-items:center;gap:14px;}
+.updated{font-size:12.5px;color:var(--muted);}
+.btn{background:var(--ink);color:#fff;border:none;border-radius:9px;padding:8px 15px;font:inherit;font-size:13px;font-weight:600;cursor:pointer;}
+.btn.gold{background:var(--gold);}
+.btn.ghost{background:var(--card);color:var(--ink);border:1px solid var(--line);font-weight:600;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.spin{display:inline-block;animation:spin .8s linear infinite;}
+main{max-width:1240px;margin:0 auto;padding:24px 20px 64px;}
+section{margin-bottom:34px;}
+h2{font-size:25px;margin-bottom:3px;}
+h3{font-size:17px;margin:20px 0 10px;}
+.sub{color:var(--muted);font-size:13px;margin-bottom:14px;max-width:820px;}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:12px;}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:15px 17px;}
+.card .label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);}
+.card .value{font-size:25px;font-family:'Playfair Display',serif;margin-top:4px;line-height:1.1;}
+.card .delta{font-size:12px;color:var(--muted);margin-top:3px;}
+.card .chg{font-size:11.5px;font-weight:600;margin-top:5px;}
+.up{color:var(--green);} .down{color:var(--red);} .flat{color:var(--muted);}
+.table-wrap{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:12px;}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:13.5px;}
+th,td{padding:10px 12px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap;}
+th:first-child,td:first-child{text-align:left;}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600;background:#FCFAF6;position:sticky;top:0;z-index:1;}
+tbody tr:last-child td{border-bottom:none;}
+tr.mine{background:var(--mine);}
+td.title-cell{max-width:330px;}
+td.title-cell>div,td.title-cell a{display:inline-block;max-width:330px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom;}
+.num{text-align:right;font-variant-numeric:tabular-nums;}
+.muted{color:var(--muted);}
+.neg{color:var(--red);} .pos{color:var(--green);}
+.badge{display:inline-block;font-size:10.5px;padding:2px 8px;border-radius:99px;background:var(--gold-light);color:#6b5318;letter-spacing:.03em;white-space:nowrap;}
+.badge.sold{background:#FCE7EB;color:var(--red);} .badge.bought{background:#DCEAD0;color:var(--green);}
+.badge.offer{background:#E0E7FF;color:#3730A3;} .badge.hot{background:#FBE5E8;color:var(--red);}
+.badge.auto{background:#F1EADD;color:#9a7b2e;} .badge.aged{background:#FEF3C7;color:#92400E;}
+.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.chart-box{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;}
+.chart-box h3{margin:0 0 10px;font-size:15px;}
+.bars .row{display:flex;align-items:center;gap:11px;padding:5px 0;}
+.bars .k{width:140px;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bars .track{flex:1;height:9px;background:#F1EADD;border-radius:99px;overflow:hidden;}
+.bars .fill{height:100%;border-radius:99px;}
+.bars .v{width:70px;text-align:right;font-size:12.5px;font-variant-numeric:tabular-nums;}
+.bars .n{width:34px;text-align:right;font-size:11.5px;color:var(--muted);}
+.cmp th:first-child,.cmp td:first-child{font-weight:600;}
+.cmp th{text-align:right;} .cmp th.col{color:var(--ink);}
+.col-gentry{color:var(--gold);} .col-onetime{color:var(--ink);}
+.pill-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.pill{text-decoration:none;padding:7px 15px;border-radius:99px;font-size:13px;border:1px solid var(--line);background:var(--card);color:var(--muted);cursor:pointer;}
+.pill.active{border-color:var(--gold);color:var(--ink);background:var(--mine);font-weight:600;}
+.toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:14px;}
+input,select{font:inherit;}
+.inp{border:1px solid #E2DACB;border-radius:8px;padding:8px 11px;background:#fff;font-size:13px;}
+.thumb{width:38px;height:38px;border-radius:7px;object-fit:cover;background:#F1EADD;border:1px solid var(--line);}
+.pcode{display:inline-block;min-width:26px;text-align:center;font-size:11px;font-weight:600;padding:2px 7px;border-radius:99px;color:#fff;}
+.insight-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;}
+.insight{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;}
+.insight .tag{font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--gold);}
+.insight p{margin:.4rem 0 0;font-size:14px;line-height:1.45;}
+.dark{background:var(--ink2);border:1px solid #4A3B22;border-radius:14px;padding:20px 22px;color:#EDE7DC;}
+.dark .label{color:#C9A75A;}
+.dark .dstat{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:14px;margin:6px 0 16px;}
+.dark .dstat .v{font-family:'Playfair Display',serif;font-size:24px;color:#fff;margin-top:2px;}
+.dark .dstat .l{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#9C938A;}
+.dark .tier{background:#2A2420;border:1px solid #4A3B22;border-radius:10px;padding:12px 14px;}
+.dark table{min-width:0;}
+.dark th,.dark td{border-bottom-color:#322D29;color:#E7E1D8;}
+.dark th{background:transparent;color:#9C938A;}
+.note{background:#FBF3E6;border:1px solid #ECDCB8;color:#6b5318;border-radius:10px;padding:10px 14px;font-size:12.5px;margin-bottom:16px;}
+.footnote{font-size:12px;color:var(--muted);margin-top:24px;}
+.empty{padding:30px;text-align:center;color:#A8A29E;font-size:13px;}
+.loading{display:flex;flex-direction:column;align-items:center;gap:14px;padding:80px 0;color:var(--muted);}
+.spinner{width:34px;height:34px;border:3px solid var(--line);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;}
+@media (max-width:760px){
+  .chart-grid{grid-template-columns:1fr;}
+  header h1{font-size:18px;}
+  .card .value{font-size:21px;}
+  main{padding:16px 12px 56px;}
+  .right{width:100%;}
+}
 </style>
-</helmet>
-<div style="min-height:100vh;">
+</head>
+<body>
+<header><div class="header-inner">
+  <h1>Watch<span class="accent">Intel</span></h1>
+  <span class="tagline">Luxury Watch Market Intelligence</span>
+  <nav id="nav"></nav>
+  <div class="right">
+    <span class="updated" id="updated">Loading…</span>
+    <button class="btn ghost" id="refreshBtn">↻ Refresh</button>
+  </div>
+</div></header>
+<main><div id="view"></div></main>
 
-  <header style="position:sticky;top:0;z-index:20;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border-bottom:1px solid #EDE6DA;">
-    <div style="max-width:1240px;margin:0 auto;padding:14px 20px;display:flex;flex-wrap:wrap;align-items:center;gap:10px 26px;">
-      <div style="display:flex;align-items:baseline;gap:10px;">
-        <span style="font-family:'Playfair Display',serif;font-weight:700;font-size:22px;letter-spacing:.01em;">Watch<span style="color:#B08D3E;">Intel</span></span>
-        <span style="font-size:11px;color:#A8A29E;letter-spacing:.06em;text-transform:uppercase;">Inventory Monitor</span>
+<script type="module">
+import { fetchAll, getHistory } from './watch-data.js';
+
+/* ─────────────── state ─────────────── */
+const TABS = [
+  ['cockpit','Executive Cockpit'],
+  ['dealers','Dealer Comparison'],
+  ['movements','Market Movements'],
+  ['brands','Brand Intelligence'],
+  ['dealcheck','Reference / Deal Check'],
+  ['inventory','Inventory Explorer'],
+  ['reports','Reports / Archive'],
+];
+const STATE = {
+  tab: 'cockpit', data: null, archive: [], refreshing: true, error: null,
+  lookup: '', salesYear: null,
+  inv: { q:'', source:'all', brand:'all', partner:'all', incl:'all', minP:'', maxP:'', year:'', sort:'value' },
+  archiveQ: '', showForm: false,
+  form: blankForm(),
+};
+let charts = [];
+
+/* ─────────────── helpers ─────────────── */
+function peso(n){ if(n==null||isNaN(n)) return '—'; return '₱'+(n>=1e9?(n/1e9).toFixed(2)+'B':n>=1e6?(n/1e6).toFixed(2)+'M':n>=1e3?(n/1e3).toFixed(0)+'K':Math.round(n)); }
+function full(n){ return (n==null||isNaN(n))?'—':'₱'+Math.round(n).toLocaleString(); }
+function esc(s){ return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function normRef(s){ return (s||'').toUpperCase().replace(/[^0-9A-Z]/g,''); }
+function partnerColor(code){ const m={'1':'#B08D3E','2':'#1D4ED8','3':'#9F1239','4':'#3F6212','5':'#7C3AED','6':'#0E7490'}; return m[code]||'#A8A29E'; }
+function partnerLabel(code){ return (!code||code==='Unassigned')?'Unassigned':'Partner '+code; }
+function blankForm(){ const d=new Date(Date.now()+8*3600*1000).toISOString().slice(0,10); return {kind:'Bought',brand:'',model:'',ref:'',year:'',cond:'',price:'',cost:'',incl:'',date:d,source:'',notes:''}; }
+function todayStr(){ return new Date(Date.now()+8*3600*1000).toISOString().slice(0,10); }
+function nowParts(){ const n=new Date(Date.now()+8*3600*1000); return {y:n.getUTCFullYear(),m:n.getUTCMonth()+1}; }
+function parseD(d){ const t=Date.parse((d||'')+'T00:00:00+08:00'); return isNaN(t)?null:t; }
+function ym(d){ const m=/^(\d{4})-(\d{2})/.exec(d||''); return m?{y:+m[1],mo:+m[2]}:null; }
+const el = id => document.getElementById(id);
+
+function liveItems(){ const d=STATE.data; return d ? [...(d.gentry||[]), ...(d.onetime||[])] : []; }
+function soldRecords(){ return STATE.archive.filter(r=>r.kind==='Sold'); }
+function soldWindow(days){ const t=Date.now(); return soldRecords().filter(r=>{ const p=parseD(r.date); return p!=null && (t-p)<=days*86400000; }); }
+function sumP(arr){ return arr.reduce((a,r)=>a+(r.price||0),0); }
+function sLbl(n){ return n+(n===1?' sale':' sales'); }
+function sourceOfSale(r){ const s=r.source||''; if(/^gentry/i.test(s)) return 'Gentry'; if(/1\s*time|1tp/i.test(s)) return '1TimePiece'; return 'Other'; }
+
+const EXPOSURE = ['Rolex','Audemars Piguet','Patek Philippe','Cartier','Tudor','Omega'];
+const HOT = [
+  ['Rolex steel sports', w=>/rolex/i.test(w.brand) && /submariner|gmt|daytona|explorer|sea-?dweller|yacht-?master/i.test(w.name)],
+  ['Daytona', w=>/daytona/i.test(w.name)],
+  ['GMT-Master II', w=>/gmt-?master|gmt/i.test(w.name) && /rolex/i.test(w.brand)],
+  ['Submariner', w=>/submariner/i.test(w.name)],
+  ['Datejust', w=>/datejust/i.test(w.name)],
+  ['Cartier Santos', w=>/cartier/i.test(w.brand) && /santos/i.test(w.name)],
+  ['AP Royal Oak / Offshore', w=>/audemars|\bAP\b/i.test(w.brand) && /royal\s*oak|offshore/i.test(w.name)],
+  ['Patek Nautilus / Aquanaut', w=>/nautilus|aquanaut/i.test(w.name)],
+  ['Richard Mille', w=>/richard\s*mille/i.test(w.brand) || /\bRM\s?\d/i.test(w.name)],
+];
+
+/* ─────────────── archive persistence (schema preserved) ─────────────── */
+async function loadArchive(){
+  let arch=[];
+  try{ const r=await fetch('./price-archive.json'); if(r.ok) arch=await r.json(); }catch(e){}
+  try{ const ls=JSON.parse(localStorage.getItem('wi_archive_v1')); if(Array.isArray(ls)) arch=ls; }catch(e){}
+  return Array.isArray(arch)?arch:[];
+}
+function persistArchive(a){ try{ localStorage.setItem('wi_archive_v1', JSON.stringify(a)); }catch(e){} }
+function mergeAutoSold(list){
+  const seen=new Set(STATE.archive.filter(r=>r.srcKey).map(r=>r.srcKey));
+  const add=list.filter(r=>r.srcKey && !seen.has(r.srcKey));
+  if(!add.length) return;
+  STATE.archive=[...add, ...STATE.archive];
+  persistArchive(STATE.archive);
+}
+
+/* ─────────────── data load / refresh ─────────────── */
+async function refresh(force){
+  STATE.refreshing=true; renderHeader();
+  try{
+    const d=await fetchAll(force);
+    if(d.autoSold && d.autoSold.length) mergeAutoSold(d.autoSold);
+    STATE.data=d; STATE.error=null;
+  }catch(e){ STATE.error=String(e&&e.message||e); }
+  STATE.refreshing=false; render();
+}
+
+/* ─────────────── deal-check comps (logic preserved + extended) ─────────────── */
+function comps(query){
+  const q=(query||'').trim().toLowerCase(); if(!q) return [];
+  const nq=normRef(query);
+  const match=(name,ref)=>{ const hay=(name||'').toLowerCase(); if(hay.includes(q)) return true; if(nq.length>=3 && normRef(ref).includes(nq)) return true; return false; };
+  const out=[]; const d=STATE.data;
+  if(d){
+    (d.gentry||[]).forEach(w=>{ if(w.price && match(w.name,w.ref)) out.push({name:w.name,tag:'Gentry',src:'Gentry',date:'live',price:w.price}); });
+    (d.onetime||[]).forEach(w=>{ if(w.price && match(w.name,w.ref)) out.push({name:w.name,tag:'1TP'+(w.partner?' P'+w.partner:''),src:'1TimePiece',date:'live',price:w.price}); });
+  }
+  STATE.archive.forEach(r=>{ if(r.price && match((r.model||'')+' '+(r.brand||''),r.ref)) out.push({name:((r.brand||'')+' '+(r.model||'')).trim(),tag:r.kind,src:'Archive',date:r.date,price:r.price}); });
+  return out;
+}
+
+/* ─────────────── render dispatch ─────────────── */
+function renderHeader(){
+  el('nav').innerHTML = TABS.map(([k,label])=>`<button data-tab="${k}" class="${STATE.tab===k?'active':''}">${label}</button>`).join('');
+  el('nav').querySelectorAll('button').forEach(b=> b.onclick=()=>{ STATE.tab=b.dataset.tab; render(); window.scrollTo(0,0); });
+  el('updated').textContent = STATE.data ? ('Updated '+STATE.data.generatedAt+' PHT · auto-refresh 6h'+(STATE.data.stale?' · cached':'')) : (STATE.error?'Live fetch issue':'Loading…');
+  const rb=el('refreshBtn');
+  rb.innerHTML = STATE.refreshing ? '<span class="spin">↻</span> Refreshing…' : '↻ Refresh';
+  rb.disabled = STATE.refreshing;
+  rb.onclick = ()=> refresh(true);
+}
+function destroyCharts(){ charts.forEach(c=>{ try{c.destroy();}catch(e){} }); charts=[]; }
+
+function render(){
+  renderHeader();
+  destroyCharts();
+  const v=el('view');
+  if(STATE.refreshing && !STATE.data){ v.innerHTML='<div class="loading"><div class="spinner"></div><div>Fetching live inventory from Gentry &amp; 1TimePiece…</div></div>'; return; }
+  if(STATE.error && !STATE.data){ v.innerHTML=`<div class="empty" style="color:var(--red)">Couldn't load market data: ${esc(STATE.error)}<br><br>Your saved archive is safe. Try Refresh.</div>`; return; }
+  ({cockpit:renderCockpit,dealers:renderDealers,movements:renderMovements,brands:renderBrands,dealcheck:renderDealCheck,inventory:renderInventory,reports:renderReports}[STATE.tab]||renderCockpit)();
+}
+
+/* ─────────────── line chart helper (Bag-Intel style) ─────────────── */
+function lineChart(canvas, datasets, money){
+  if(!window.Chart) return;
+  const c=new Chart(canvas,{type:'line',data:{datasets},options:{
+    responsive:true,maintainAspectRatio:false,interaction:{mode:'nearest',intersect:false},
+    scales:{x:{type:'category',grid:{display:false},ticks:{maxTicksLimit:8,font:{size:10}}},
+      y:{ticks:{callback:v=>money?peso(v):v,font:{size:10}},grid:{color:'#F0EAE0'}}},
+    plugins:{legend:{labels:{boxWidth:10,font:{size:11}}},
+      tooltip:{callbacks:{label:cc=>cc.dataset.label+': '+(money?full(cc.parsed.y):cc.parsed.y)}}}
+  }});
+  charts.push(c);
+}
+function ds(label,points,color){ return {label,data:points,borderColor:color,backgroundColor:color+'22',pointRadius:1.5,borderWidth:2,tension:.25,fill:false}; }
+
+/* ─────────────── TAB 1 · Executive Cockpit ─────────────── */
+function renderCockpit(){
+  const d=STATE.data, ag=d.agg;
+  const combined=ag.gentry.value+ag.onetime.value;
+  const pieces=ag.gentry.count+ag.onetime.count;
+  // deltas vs last committed history day before today
+  const hist=(getHistory()||[]); const today=todayStr();
+  const baseRow=hist.filter(h=>h&&h.d&&h.d<today).slice(-1)[0]||null;
+  const chg=(now,was)=>{ if(was==null||!isFinite(was)||!baseRow) return ''; const diff=now-was; if(!diff) return `<div class="chg flat">no change vs ${baseRow.d.slice(5)}</div>`; return `<div class="chg ${diff>0?'up':'down'}">${diff>0?'▲':'▼'} ${peso(Math.abs(diff))} vs ${baseRow.d.slice(5)}</div>`; };
+  const w7=soldWindow(7), w30=soldWindow(30);
+  const {y:cy,m:cm}=nowParts();
+  const wmtd=soldRecords().filter(r=>{const p=ym(r.date);return p&&p.y===cy&&p.mo===cm;});
+  const st30=(pieces+w30.length)?Math.round(w30.length/(pieces+w30.length)*100):0;
+  // top 5 brands by combined inventory value
+  const bmap={}; liveItems().forEach(w=>{ if(!w.price) return; const b=w.brand||'Other'; (bmap[b]=bmap[b]||{v:0,n:0}); bmap[b].v+=w.price; bmap[b].n++; });
+  const topBrands=Object.entries(bmap).map(([k,x])=>({k,...x})).sort((a,b)=>b.v-a.v).slice(0,5);
+  const tbMax=topBrands.reduce((m,x)=>Math.max(m,x.v),1);
+  // high-value alerts ≥ ₱1M
+  const hi=liveItems().filter(w=>w.price&&w.price>=1e6).sort((a,b)=>b.price-a.price);
+  const hiVal=sumP(hi);
+  // latest sales / removed
+  const latest=soldRecords().slice().sort((a,b)=>(a.date<b.date?1:-1)).slice(0,8);
+
+  el('view').innerHTML = `
+  <section>
+    <h2>Executive Cockpit</h2>
+    <p class="sub">Owner-level view of the whole book — live inventory across Gentry &amp; 1TimePiece, recent sell-through, and high-value exposure. Peso values from listed prices.</p>
+    <div class="cards">
+      <div class="card"><div class="label">Combined value</div><div class="value">${peso(combined)}</div><div class="delta">${pieces.toLocaleString()} pieces tracked</div>${chg(combined,baseRow?baseRow.gv+baseRow.ov:null)}</div>
+      <div class="card"><div class="label">Gentry</div><div class="value">${peso(ag.gentry.value)}</div><div class="delta">${ag.gentry.count} watches</div>${chg(ag.gentry.value,baseRow?baseRow.gv:null)}</div>
+      <div class="card"><div class="label">1TimePiece</div><div class="value">${peso(ag.onetime.value)}</div><div class="delta">${ag.onetime.count} watches · ${ag.onetime.held} on hold</div>${chg(ag.onetime.value,baseRow?baseRow.ov:null)}</div>
+      <div class="card"><div class="label">Sold · 7 days</div><div class="value">${peso(sumP(w7))}</div><div class="delta">${sLbl(w7.length)}</div></div>
+      <div class="card"><div class="label">Sold · 30 days</div><div class="value">${peso(sumP(w30))}</div><div class="delta">${sLbl(w30.length)}</div></div>
+      <div class="card"><div class="label">Sold · MTD</div><div class="value">${peso(sumP(wmtd))}</div><div class="delta">${sLbl(wmtd.length)}</div></div>
+      <div class="card"><div class="label">Sell-through · 30d</div><div class="value">${st30}%</div><div class="delta">of listed + sold</div></div>
+      <div class="card"><div class="label">Pieces ≥ ₱1M</div><div class="value">${hi.length}</div><div class="delta">${peso(hiVal)} exposure</div></div>
+    </div>
+  </section>
+
+  <section>
+    <h3 style="margin-top:0">Dealers side by side</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Source</th><th>Items</th><th>Inv. value</th><th>Avg ticket</th><th>Sold MTD</th><th>Sold ₱ MTD</th><th>Brands</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr class="mine"><td>Gentry Timepieces</td><td class="num">${ag.gentry.count}</td><td class="num">${full(ag.gentry.value)}</td><td class="num">${peso(ag.gentry.avg)}</td>
+          <td class="num">${mtdBySource('Gentry').n}</td><td class="num">${peso(mtdBySource('Gentry').v)}</td><td class="num">${ag.gentry.byBrand.length}</td><td class="muted" style="text-align:right">own retail</td></tr>
+        <tr><td>1TimePiece</td><td class="num">${ag.onetime.count}</td><td class="num">${full(ag.onetime.value)}</td><td class="num">${peso(ag.onetime.avg)}</td>
+          <td class="num">${mtdBySource('1TimePiece').n}</td><td class="num">${peso(mtdBySource('1TimePiece').v)}</td><td class="num">${ag.onetime.byBrand.length}</td><td class="muted" style="text-align:right">${ag.onetime.held} on hold · ${ag.onetime.byPartner.length} partners</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <h3 style="margin-top:0">Trends</h3>
+    <p class="sub">Daily history committed by the 6-hour refresh — shared across devices.</p>
+    <div class="chart-grid">
+      <div class="chart-box"><h3>Inventory value over time</h3><div style="height:260px"><canvas id="chInv"></canvas></div></div>
+      <div class="chart-box"><h3>Pieces tracked over time</h3><div style="height:260px"><canvas id="chCnt"></canvas></div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="chart-grid">
+      <div>
+        <h3 style="margin-top:0">Top 5 brands by inventory value</h3>
+        <div class="chart-box bars">
+          ${topBrands.length?topBrands.map(b=>`<div class="row"><div class="k">${esc(b.k)}</div><div class="track"><div class="fill" style="background:var(--gold);width:${Math.max(2,b.v/tbMax*100)}%"></div></div><div class="v">${peso(b.v)}</div><div class="n">${b.n}</div></div>`).join(''):'<div class="empty">No priced inventory.</div>'}
+        </div>
       </div>
-      <nav style="display:flex;gap:20px;">
-        <button onClick="{{ goOverview }}" style="{{ navOverview }}">Overview</button>
-        <button onClick="{{ goGentry }}" style="{{ navGentry }}">Gentry</button>
-        <button onClick="{{ goOnetime }}" style="{{ navOnetime }}">1TimePiece</button>
-        <button onClick="{{ goSales }}" style="{{ navSales }}">Sales</button>
-        <button onClick="{{ goArchive }}" style="{{ navArchive }}">Price Archive</button>
-      </nav>
-      <div style="margin-left:auto;display:flex;align-items:center;gap:12px;">
-        <span style="font-size:11.5px;color:#78716C;text-align:right;line-height:1.35;">{{ updatedText }}</span>
-        <button onClick="{{ refresh }}" style="display:inline-flex;align-items:center;gap:7px;background:#1C1917;color:#fff;border:none;border-radius:99px;padding:8px 15px;font-size:12.5px;font-weight:600;">
-          <span style="{{ spinStyle }}">↻</span>{{ refreshLabel }}
-        </button>
+      <div>
+        <h3 style="margin-top:0">Latest sales / removed</h3>
+        <div class="table-wrap" style="max-height:300px;overflow:auto">
+          <table style="min-width:0"><thead><tr><th>Date</th><th>Watch</th><th>Source</th><th>Price</th></tr></thead>
+          <tbody>${latest.length?latest.map(r=>`<tr><td class="muted">${r.date||'—'}</td><td class="title-cell"><div>${esc(((r.brand||'')+' '+(r.model||'')).trim()||'watch')}</div></td><td class="muted">${esc(sourceOfSale(r))}</td><td class="num">${full(r.price)}</td></tr>`).join(''):'<tr><td colspan="4" class="empty">No sales recorded yet.</td></tr>'}</tbody></table>
+        </div>
       </div>
     </div>
-  </header>
+  </section>
 
-  <main style="max-width:1240px;margin:0 auto;padding:26px 18px 80px;">
-
-    <sc-if value="{{ stale }}" hint-placeholder-val="{{ false }}">
-      <div style="background:#FEF3C7;border:1px solid #FDE68A;color:#92400E;border-radius:10px;padding:9px 14px;font-size:12.5px;margin-bottom:18px;">Showing the last saved snapshot — live refresh didn't go through. Hit refresh to retry.</div>
-    </sc-if>
-
-    <sc-if value="{{ showLoading }}" hint-placeholder-val="{{ true }}">
-      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:120px 0;gap:18px;">
-        <div style="width:34px;height:34px;border:3px solid #EDE6DA;border-top-color:#B08D3E;border-radius:50%;animation:wi-spin .8s linear infinite;"></div>
-        <div style="font-size:14px;color:#78716C;">Fetching live inventory from Gentry &amp; 1TimePiece…</div>
-      </div>
-    </sc-if>
-
-    <sc-if value="{{ showError }}" hint-placeholder-val="{{ false }}">
-      <div style="background:#FCE7EB;border:1px solid #F9C9D4;color:#9F1239;border-radius:10px;padding:16px 18px;">
-        <div style="font-weight:600;margin-bottom:4px;">Couldn't load the live data.</div>
-        <div style="font-size:13px;">{{ errorMsg }}</div>
-        <button onClick="{{ refresh }}" style="margin-top:10px;background:#9F1239;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:13px;">Try again</button>
-      </div>
-    </sc-if>
-
-    <!-- ════════ OVERVIEW ════════ -->
-    <sc-if value="{{ showOverview }}" hint-placeholder-val="{{ false }}">
-    <div>
-      <h2 style="font-family:'Playfair Display',serif;font-size:25px;font-weight:600;margin:0 0 3px;">Market Overview</h2>
-      <p style="color:#78716C;font-size:13px;margin:0 0 18px;">Two sources, live. Peso values from listed prices. 1TimePiece excludes pieces marked sold.</p>
-
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:26px;">
-        <sc-for list="{{ overviewKpis }}" as="k" hint-placeholder-count="4">
-          <div style="background:#fff;border:1px solid #EDE6DA;border-radius:12px;padding:16px 18px;">
-            <div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#78716C;">{{ k.label }}</div>
-            <div style="font-family:'Playfair Display',serif;font-size:27px;margin-top:5px;line-height:1.1;">{{ k.value }}</div>
-            <div style="font-size:12px;color:#78716C;margin-top:3px;">{{ k.delta }}</div>
-            <div style="font-size:11.5px;font-weight:600;margin-top:5px;color:{{ k.changeColor }};">{{ k.change }}</div>
-          </div>
-        </sc-for>
-      </div>
-
-      <h3 style="font-family:'Playfair Display',serif;font-size:17px;font-weight:600;margin:0 0 10px;">Recent activity</h3>
-      <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:18px;margin-bottom:30px;" class="wi-cols">
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;align-content:start;">
-          <sc-for list="{{ overviewActivityCards }}" as="k" hint-placeholder-count="4">
-            <div style="background:#fff;border:1px solid #EDE6DA;border-radius:12px;padding:14px 16px;">
-              <div style="font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:#78716C;">{{ k.label }}</div>
-              <div style="font-family:'Playfair Display',serif;font-size:21px;margin-top:4px;line-height:1.1;">{{ k.value }}</div>
-              <div style="font-size:11.5px;color:#78716C;margin-top:3px;">{{ k.delta }}</div>
-            </div>
-          </sc-for>
-        </div>
-        <div style="background:#fff;border:1px solid #EDE6DA;border-radius:12px;padding:14px 16px;">
-          <div style="font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:#78716C;margin-bottom:8px;">Latest sales</div>
-          <sc-if value="{{ overviewHasSales }}" hint-placeholder-val="{{ false }}">
-            <sc-for list="{{ overviewLatestSales }}" as="r" hint-placeholder-count="5">
-              <div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #F3EEE4;">
-                <div style="font-size:11px;color:#A8A29E;font-variant-numeric:tabular-nums;white-space:nowrap;width:62px;">{{ r.date }}</div>
-                <div style="flex:1;min-width:0;font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ r.title }}</div>
-                <div style="font-size:11px;color:#78716C;white-space:nowrap;">{{ r.channel }}</div>
-                <div style="font-size:12.5px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap;">{{ r.price }}</div>
-              </div>
-            </sc-for>
-          </sc-if>
-          <sc-if value="{{ overviewNoSales }}" hint-placeholder-val="{{ false }}">
-            <div style="color:#A8A29E;font-size:12.5px;padding:14px 0;text-align:center;">No sales recorded yet.</div>
-          </sc-if>
-        </div>
-      </div>
-
-      <h3 style="font-family:'Playfair Display',serif;font-size:17px;font-weight:600;margin:0 0 10px;">Sources side by side</h3>
-      <div class="wi-scroll" style="overflow-x:auto;background:#fff;border:1px solid #EDE6DA;border-radius:12px;margin-bottom:30px;">
-        <table style="width:100%;min-width:620px;font-size:13.5px;">
-          <thead><tr>
-            <th style="text-align:left;padding:11px 14px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;">Source</th>
-            <th style="text-align:right;padding:11px 14px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;">Pieces</th>
-            <th style="text-align:right;padding:11px 14px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;">Inventory value</th>
-            <th style="text-align:right;padding:11px 14px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;">Avg ticket</th>
-            <th style="text-align:right;padding:11px 14px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;">Brands</th>
-            <th style="text-align:right;padding:11px 14px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;">Notes</th>
-          </tr></thead>
-          <tbody>
-            <sc-for list="{{ sourceRows }}" as="s" hint-placeholder-count="2">
-              <tr>
-                <td style="text-align:left;padding:12px 14px;border-bottom:1px solid #F3EEE4;font-weight:600;">{{ s.name }}</td>
-                <td style="text-align:right;padding:12px 14px;border-bottom:1px solid #F3EEE4;font-variant-numeric:tabular-nums;">{{ s.count }}</td>
-                <td style="text-align:right;padding:12px 14px;border-bottom:1px solid #F3EEE4;font-variant-numeric:tabular-nums;font-weight:600;">{{ s.value }}</td>
-                <td style="text-align:right;padding:12px 14px;border-bottom:1px solid #F3EEE4;font-variant-numeric:tabular-nums;">{{ s.avg }}</td>
-                <td style="text-align:right;padding:12px 14px;border-bottom:1px solid #F3EEE4;">{{ s.brands }}</td>
-                <td style="text-align:right;padding:12px 14px;border-bottom:1px solid #F3EEE4;color:#78716C;font-size:12.5px;">{{ s.note }}</td>
-              </tr>
-            </sc-for>
-          </tbody>
-        </table>
-      </div>
-
-      <h3 style="font-family:'Playfair Display',serif;font-size:17px;font-weight:600;margin:0 0 4px;">Value over time</h3>
-      <p style="color:#78716C;font-size:12.5px;margin:0 0 12px;">History accumulates each day you open the dashboard.</p>
-      <div style="background:#fff;border:1px solid #EDE6DA;border-radius:12px;padding:18px;margin-bottom:30px;">
-        <sc-if value="{{ hasHistory }}" hint-placeholder-val="{{ false }}">
-          <div style="display:flex;align-items:flex-end;gap:6px;height:150px;">
-            <sc-for list="{{ historyBars }}" as="h" hint-placeholder-count="8">
-              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;">
-                <div style="width:100%;display:flex;flex-direction:column;justify-content:flex-end;height:120px;">
-                  <div title="{{ h.title }}" style="{{ h.barStyle }}"></div>
-                </div>
-                <div style="font-size:10px;color:#A8A29E;white-space:nowrap;">{{ h.label }}</div>
-              </div>
-            </sc-for>
-          </div>
-        </sc-if>
-        <sc-if value="{{ noHistory }}" hint-placeholder-val="{{ false }}">
-          <div style="color:#A8A29E;font-size:13px;padding:24px 0;text-align:center;">First snapshot saved today — come back tomorrow to see the trend build.</div>
-        </sc-if>
-      </div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;" class="wi-cols">
-        <div style="background:#fff;border:1px solid #EDE6DA;border-radius:12px;padding:18px;">
-          <h3 style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin:0 0 12px;">Gentry — value by brand</h3>
-          <sc-for list="{{ gBrandRows }}" as="b" hint-placeholder-count="6">
-            <div style="display:flex;align-items:center;gap:11px;padding:6px 0;">
-              <div style="width:130px;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ b.key }}</div>
-              <div style="flex:1;height:9px;background:#F1EADD;border-radius:99px;overflow:hidden;"><div style="{{ b.barStyle }}"></div></div>
-              <div style="width:64px;text-align:right;font-size:12.5px;font-variant-numeric:tabular-nums;">{{ b.vshort }}</div>
-              <div style="width:30px;text-align:right;font-size:11.5px;color:#A8A29E;">{{ b.n }}</div>
-            </div>
-          </sc-for>
-        </div>
-        <div style="background:#fff;border:1px solid #EDE6DA;border-radius:12px;padding:18px;">
-          <h3 style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin:0 0 12px;">1TimePiece — value by brand</h3>
-          <sc-for list="{{ oBrandRows }}" as="b" hint-placeholder-count="6">
-            <div style="display:flex;align-items:center;gap:11px;padding:6px 0;">
-              <div style="width:130px;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ b.key }}</div>
-              <div style="flex:1;height:9px;background:#F1EADD;border-radius:99px;overflow:hidden;"><div style="{{ b.barStyle }}"></div></div>
-              <div style="width:64px;text-align:right;font-size:12.5px;font-variant-numeric:tabular-nums;">{{ b.vshort }}</div>
-              <div style="width:30px;text-align:right;font-size:11.5px;color:#A8A29E;">{{ b.n }}</div>
-            </div>
-          </sc-for>
-        </div>
-      </div>
+  <section>
+    <h3 style="margin-top:0">High-value alerts · pieces ≥ ₱1M <span class="muted" style="font-weight:400;font-size:13px">(${hi.length})</span></h3>
+    <div class="table-wrap" style="max-height:360px;overflow:auto">
+      <table><thead><tr><th>Watch</th><th>Brand</th><th>Ref</th><th>Source</th><th>Price</th></tr></thead>
+      <tbody>${hi.length?hi.slice(0,60).map(w=>`<tr><td class="title-cell">${w.url?`<a href="${esc(w.url)}" target="_blank" rel="noopener">${esc(w.name)}</a>`:`<div>${esc(w.name)}</div>`}</td><td>${esc(w.brand||'—')}</td><td class="muted">${esc(w.ref||'—')}</td><td class="muted">${esc(w.source)}${w.partner?' · P'+esc(w.partner):''}</td><td class="num">${full(w.price)}</td></tr>`).join(''):'<tr><td colspan="5" class="empty">No pieces over ₱1M right now.</td></tr>'}</tbody></table>
     </div>
-    </sc-if>
+  </section>`;
 
-    <!-- ════════ GENTRY ════════ -->
-    <sc-if value="{{ showGentry }}" hint-placeholder-val="{{ false }}">
-    <div>
-      <h2 style="font-family:'Playfair Display',serif;font-size:25px;font-weight:600;margin:0 0 3px;">Gentry Timepieces</h2>
-      <p style="color:#78716C;font-size:13px;margin:0 0 18px;"><a href="https://www.gentry.ph" target="_blank" rel="noopener" style="color:#B08D3E;">gentry.ph</a> · own retail stock · live from Shopify catalog</p>
-
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:12px;margin-bottom:24px;">
-        <sc-for list="{{ gentryKpis }}" as="k" hint-placeholder-count="4">
-          <div style="background:#fff;border:1px solid #EDE6DA;border-radius:12px;padding:16px 18px;">
-            <div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#78716C;">{{ k.label }}</div>
-            <div style="font-family:'Playfair Display',serif;font-size:25px;margin-top:5px;line-height:1.1;">{{ k.value }}</div>
-            <div style="font-size:12px;color:#78716C;margin-top:3px;">{{ k.delta }}</div>
-          </div>
-        </sc-for>
-      </div>
-
-      <div style="background:#fff;border:1px solid #EDE6DA;border-radius:12px;padding:18px;margin-bottom:24px;">
-        <h3 style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin:0 0 12px;">Value by brand</h3>
-        <sc-for list="{{ gBrandRows }}" as="b" hint-placeholder-count="8">
-          <div style="display:flex;align-items:center;gap:11px;padding:6px 0;">
-            <div style="width:150px;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ b.key }}</div>
-            <div style="flex:1;height:9px;background:#F1EADD;border-radius:99px;overflow:hidden;"><div style="{{ b.barStyle }}"></div></div>
-            <div style="width:72px;text-align:right;font-size:12.5px;font-variant-numeric:tabular-nums;">{{ b.vshort }}</div>
-            <div style="width:34px;text-align:right;font-size:11.5px;color:#A8A29E;">{{ b.n }}</div>
-          </div>
-        </sc-for>
-      </div>
-
-      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:10px;">
-        <h3 style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin:0;">Live listings <span style="color:#A8A29E;font-weight:400;font-size:13px;">({{ gCount }})</span></h3>
-        <div style="margin-left:auto;display:flex;gap:8px;">
-          <input value="{{ gentrySearch }}" onInput="{{ onGentrySearch }}" placeholder="Search model / ref…" style="border:1px solid #E2DACB;border-radius:8px;padding:7px 11px;width:200px;background:#fff;">
-          <select value="{{ gentrySort }}" onChange="{{ onGentrySort }}" style="border:1px solid #E2DACB;border-radius:8px;padding:7px 10px;background:#fff;">
-            <option value="value">Price ↓</option>
-            <option value="value_asc">Price ↑</option>
-            <option value="name">Name A–Z</option>
-            <option value="brand">Brand</option>
-            <option value="year">Year ↓</option>
-          </select>
-        </div>
-      </div>
-      <div class="wi-scroll" style="overflow:auto;max-height:620px;background:#fff;border:1px solid #EDE6DA;border-radius:12px;">
-        <table style="width:100%;min-width:720px;font-size:13px;">
-          <thead><tr>
-            <th style="position:sticky;top:0;text-align:left;padding:10px 14px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Watch</th>
-            <th style="position:sticky;top:0;text-align:left;padding:10px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Brand</th>
-            <th style="position:sticky;top:0;text-align:left;padding:10px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Ref</th>
-            <th style="position:sticky;top:0;text-align:right;padding:10px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Year</th>
-            <th style="position:sticky;top:0;text-align:left;padding:10px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Inclusions</th>
-            <th style="position:sticky;top:0;text-align:right;padding:10px 14px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Price</th>
-          </tr></thead>
-          <tbody>
-            <sc-for list="{{ gListings }}" as="w" hint-placeholder-count="12">
-              <tr>
-                <td style="text-align:left;padding:9px 14px;border-bottom:1px solid #F3EEE4;max-width:380px;">
-                  <a href="{{ w.url }}" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;">
-                    <img src="{{ w.img }}" loading="lazy" style="width:34px;height:34px;border-radius:6px;object-fit:cover;background:#F1EADD;flex:none;">
-                    <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ w.name }}</span>
-                  </a>
-                </td>
-                <td style="text-align:left;padding:9px 12px;border-bottom:1px solid #F3EEE4;color:#57534E;">{{ w.brand }}</td>
-                <td style="text-align:left;padding:9px 12px;border-bottom:1px solid #F3EEE4;color:#78716C;font-variant-numeric:tabular-nums;">{{ w.ref }}</td>
-                <td style="text-align:right;padding:9px 12px;border-bottom:1px solid #F3EEE4;color:#78716C;font-variant-numeric:tabular-nums;">{{ w.year }}</td>
-                <td style="text-align:left;padding:9px 12px;border-bottom:1px solid #F3EEE4;">
-                  <div style="display:flex;flex-wrap:wrap;gap:4px;">
-                    <sc-for list="{{ w.incl }}" as="c" hint-placeholder-count="1">
-                      <span style="display:inline-block;font-size:10px;padding:1px 6px;border-radius:4px;background:#F1EADD;color:#6b5318;white-space:nowrap;">{{ c }}</span>
-                    </sc-for>
-                  </div>
-                </td>
-                <td style="text-align:right;padding:9px 14px;border-bottom:1px solid #F3EEE4;font-weight:600;font-variant-numeric:tabular-nums;">{{ w.price }}</td>
-              </tr>
-            </sc-for>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    </sc-if>
-
-    <!-- ════════ 1TIMEPIECE ════════ -->
-    <sc-if value="{{ showOnetime }}" hint-placeholder-val="{{ false }}">
-    <div>
-      <h2 style="font-family:'Playfair Display',serif;font-size:25px;font-weight:600;margin:0 0 3px;">1TimePiece</h2>
-      <p style="color:#78716C;font-size:13px;margin:0 0 18px;">Consignment partner network · live from the shared pricelist · 27 brand tabs · partner code from column E</p>
-
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px;">
-        <sc-for list="{{ onetimeKpis }}" as="k" hint-placeholder-count="5">
-          <div style="background:#fff;border:1px solid #EDE6DA;border-radius:12px;padding:16px 18px;">
-            <div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#78716C;">{{ k.label }}</div>
-            <div style="font-family:'Playfair Display',serif;font-size:25px;margin-top:5px;line-height:1.1;">{{ k.value }}</div>
-            <div style="font-size:12px;color:#78716C;margin-top:3px;">{{ k.delta }}</div>
-          </div>
-        </sc-for>
-      </div>
-
-      <h3 style="font-family:'Playfair Display',serif;font-size:17px;font-weight:600;margin:0 0 4px;">Inventory by partner</h3>
-      <p style="color:#78716C;font-size:12.5px;margin:0 0 12px;">Each consignment partner's share of total listed value.</p>
-      <div class="wi-scroll" style="overflow-x:auto;background:#fff;border:1px solid #EDE6DA;border-radius:12px;margin-bottom:28px;">
-        <table style="width:100%;min-width:560px;font-size:13.5px;">
-          <thead><tr>
-            <th style="text-align:left;padding:11px 16px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;">Partner</th>
-            <th style="text-align:right;padding:11px 14px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;">Pieces</th>
-            <th style="text-align:right;padding:11px 14px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;">Inventory value</th>
-            <th style="text-align:right;padding:11px 14px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;">Avg ticket</th>
-            <th style="text-align:left;padding:11px 16px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;width:38%;">Share</th>
-          </tr></thead>
-          <tbody>
-            <sc-for list="{{ partnerRows }}" as="p" hint-placeholder-count="7">
-              <tr style="{{ p.rowStyle }}">
-                <td style="text-align:left;padding:11px 16px;border-bottom:1px solid #F3EEE4;font-weight:600;"><span style="{{ p.dotStyle }}"></span>{{ p.label }}</td>
-                <td style="text-align:right;padding:11px 14px;border-bottom:1px solid #F3EEE4;font-variant-numeric:tabular-nums;">{{ p.n }}</td>
-                <td style="text-align:right;padding:11px 14px;border-bottom:1px solid #F3EEE4;font-variant-numeric:tabular-nums;font-weight:600;">{{ p.value }}</td>
-                <td style="text-align:right;padding:11px 14px;border-bottom:1px solid #F3EEE4;font-variant-numeric:tabular-nums;color:#57534E;">{{ p.avg }}</td>
-                <td style="text-align:left;padding:11px 16px;border-bottom:1px solid #F3EEE4;">
-                  <div style="display:flex;align-items:center;gap:10px;">
-                    <div style="flex:1;height:9px;background:#F1EADD;border-radius:99px;overflow:hidden;"><div style="{{ p.barStyle }}"></div></div>
-                    <span style="width:42px;text-align:right;font-size:12px;color:#78716C;font-variant-numeric:tabular-nums;">{{ p.share }}</span>
-                  </div>
-                </td>
-              </tr>
-            </sc-for>
-          </tbody>
-        </table>
-      </div>
-
-      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:10px;">
-        <h3 style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin:0;">Listings <span style="color:#A8A29E;font-weight:400;font-size:13px;">({{ oCount }})</span></h3>
-        <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;">
-          <input value="{{ oneSearch }}" onInput="{{ onOneSearch }}" placeholder="Search model / ref…" style="border:1px solid #E2DACB;border-radius:8px;padding:7px 11px;width:180px;background:#fff;">
-          <select value="{{ onePartner }}" onChange="{{ onOnePartner }}" style="border:1px solid #E2DACB;border-radius:8px;padding:7px 10px;background:#fff;">
-            <sc-for list="{{ partnerOptions }}" as="o" hint-placeholder-count="8">
-              <option value="{{ o.v }}">{{ o.t }}</option>
-            </sc-for>
-          </select>
-          <select value="{{ oneSort }}" onChange="{{ onOneSort }}" style="border:1px solid #E2DACB;border-radius:8px;padding:7px 10px;background:#fff;">
-            <option value="value">Price ↓</option>
-            <option value="value_asc">Price ↑</option>
-            <option value="brand">Brand</option>
-            <option value="name">Name A–Z</option>
-          </select>
-        </div>
-      </div>
-      <div class="wi-scroll" style="overflow:auto;max-height:620px;background:#fff;border:1px solid #EDE6DA;border-radius:12px;">
-        <table style="width:100%;min-width:760px;font-size:13px;">
-          <thead><tr>
-            <th style="position:sticky;top:0;text-align:left;padding:10px 14px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Watch</th>
-            <th style="position:sticky;top:0;text-align:left;padding:10px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Brand</th>
-            <th style="position:sticky;top:0;text-align:left;padding:10px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Ref</th>
-            <th style="position:sticky;top:0;text-align:center;padding:10px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Partner</th>
-            <th style="position:sticky;top:0;text-align:left;padding:10px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Inclusions</th>
-            <th style="position:sticky;top:0;text-align:right;padding:10px 14px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Price</th>
-          </tr></thead>
-          <tbody>
-            <sc-for list="{{ oListings }}" as="w" hint-placeholder-count="12">
-              <tr>
-                <td style="text-align:left;padding:9px 14px;border-bottom:1px solid #F3EEE4;max-width:380px;"><div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ w.name }}</div></td>
-                <td style="text-align:left;padding:9px 12px;border-bottom:1px solid #F3EEE4;color:#57534E;">{{ w.brand }}</td>
-                <td style="text-align:left;padding:9px 12px;border-bottom:1px solid #F3EEE4;color:#78716C;font-variant-numeric:tabular-nums;">{{ w.ref }}</td>
-                <td style="text-align:center;padding:9px 12px;border-bottom:1px solid #F3EEE4;"><span style="{{ w.partnerStyle }}">{{ w.partnerLabel }}</span></td>
-                <td style="text-align:left;padding:9px 12px;border-bottom:1px solid #F3EEE4;">
-                  <div style="display:flex;flex-wrap:wrap;gap:4px;">
-                    <sc-for list="{{ w.incl }}" as="c" hint-placeholder-count="2">
-                      <span style="display:inline-block;font-size:10px;padding:1px 6px;border-radius:4px;background:#F1EADD;color:#6b5318;white-space:nowrap;">{{ c }}</span>
-                    </sc-for>
-                  </div>
-                </td>
-                <td style="text-align:right;padding:9px 14px;border-bottom:1px solid #F3EEE4;font-weight:600;font-variant-numeric:tabular-nums;">{{ w.price }}</td>
-              </tr>
-            </sc-for>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    </sc-if>
-
-    <!-- ════════ SALES ════════ -->
-    <sc-if value="{{ showSales }}" hint-placeholder-val="{{ false }}">
-    <div>
-      <h2 style="font-family:'Playfair Display',serif;font-size:25px;font-weight:600;margin:0 0 3px;">Sales Monitor</h2>
-      <p style="color:#78716C;font-size:13px;margin:0 0 18px;max-width:760px;">Sales are detected <b style="color:#1C1917;font-weight:600;">automatically</b>: each refresh, any watch that leaves Gentry or 1TimePiece inventory (delisted, or marked sold) is logged here at its last-known price and tagged <span style="display:inline-block;font-size:9px;letter-spacing:.04em;padding:1px 5px;border-radius:4px;background:#F1EADD;color:#9a7b2e;vertical-align:middle;">AUTO</span>. You can also record one by hand — add the cost to any sale to see true profit. The year selector extends into future years as you grow.</p>
-
-      <sc-if value="{{ salesHasAuto }}" hint-placeholder-val="{{ false }}">
-        <div style="display:flex;align-items:center;gap:9px;background:#FBF3E6;border:1px solid #ECDCB8;color:#6b5318;border-radius:10px;padding:9px 13px;font-size:12.5px;margin:0 0 18px;">
-          <span style="font-size:13px;">⟳</span><span>{{ salesAutoNote }}</span>
-        </div>
-      </sc-if>
-
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px;">
-        <sc-for list="{{ salesKpis }}" as="k" hint-placeholder-count="5">
-          <div style="background:#fff;border:1px solid #EDE6DA;border-radius:12px;padding:16px 18px;">
-            <div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#78716C;">{{ k.label }}</div>
-            <div style="font-family:'Playfair Display',serif;font-size:24px;margin-top:5px;line-height:1.1;color:{{ k.color }};">{{ k.value }}</div>
-            <div style="font-size:12px;color:#78716C;margin-top:3px;">{{ k.delta }}</div>
-          </div>
-        </sc-for>
-      </div>
-
-      <!-- month-to-date, side by side per source -->
-      <h3 style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin:0 0 10px;">This month · by source <span style="color:#A8A29E;font-weight:400;font-size:13px;">({{ salesMtdMonthLabel }})</span></h3>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px;">
-        <sc-for list="{{ salesSourceCards }}" as="c" hint-placeholder-count="2">
-          <div style="background:#fff;border:1px solid #EDE6DA;border-radius:12px;padding:16px 18px;">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
-              <span style="width:9px;height:9px;border-radius:50%;background:{{ c.dot }};display:inline-block;"></span>
-              <span style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;">{{ c.name }}</span>
-            </div>
-            <div style="display:flex;gap:24px;flex-wrap:wrap;">
-              <div>
-                <div style="font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:#78716C;">Month to date</div>
-                <div style="font-family:'Playfair Display',serif;font-size:22px;margin-top:3px;line-height:1.1;color:{{ c.dot }};">{{ c.mtdV }}</div>
-                <div style="font-size:12px;color:#78716C;margin-top:2px;">{{ c.mtdN }}</div>
-              </div>
-              <div>
-                <div style="font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:#78716C;">Year to date</div>
-                <div style="font-family:'Playfair Display',serif;font-size:22px;margin-top:3px;line-height:1.1;">{{ c.ytdV }}</div>
-                <div style="font-size:12px;color:#78716C;margin-top:2px;">{{ c.ytdN }}</div>
-              </div>
-            </div>
-          </div>
-        </sc-for>
-      </div>
-
-      <div style="background:#fff;border:1px solid #EDE6DA;border-radius:12px;padding:18px 20px;margin-bottom:26px;">
-        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:18px;">
-          <h3 style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin:0;">Monthly sales · {{ salesYearLabel }}</h3>
-          <div style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;">
-            <sc-for list="{{ salesYears }}" as="y" hint-placeholder-count="4">
-              <button onClick="{{ y.onClick }}" style="{{ y.style }}">{{ y.label }}</button>
-            </sc-for>
-          </div>
-        </div>
-        <div style="display:flex;align-items:flex-end;gap:8px;height:175px;">
-          <sc-for list="{{ monthBars }}" as="m" hint-placeholder-count="12">
-            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;">
-              <div style="font-size:9.5px;color:#57534E;font-variant-numeric:tabular-nums;white-space:nowrap;height:12px;">{{ m.valLabel }}</div>
-              <div style="width:100%;display:flex;flex-direction:column;justify-content:flex-end;height:120px;">
-                <div title="{{ m.title }}" style="{{ m.barStyle }}"></div>
-              </div>
-              <div style="font-size:11px;color:#A8A29E;">{{ m.label }}</div>
-            </div>
-          </sc-for>
-        </div>
-      </div>
-
-      <!-- sales breakdown, Gentry vs 1TimePiece side by side -->
-      <div style="background:#fff;border:1px solid #EDE6DA;border-radius:12px;padding:18px 20px;margin-bottom:26px;">
-        <h3 style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin:0 0 14px;">Sales breakdown · side by side · {{ salesYearLabel }}</h3>
-        <table style="width:100%;font-size:13px;border-collapse:collapse;">
-          <thead><tr>
-            <th style="text-align:left;padding:8px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;border-bottom:1px solid #EDE6DA;">Metric</th>
-            <th style="text-align:right;padding:8px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#B08D3E;border-bottom:1px solid #EDE6DA;">Gentry</th>
-            <th style="text-align:right;padding:8px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#1C1917;border-bottom:1px solid #EDE6DA;">1TimePiece</th>
-          </tr></thead>
-          <tbody>
-            <sc-for list="{{ salesBreakdownRows }}" as="r" hint-placeholder-count="5">
-              <tr>
-                <td style="text-align:left;padding:9px 12px;border-bottom:1px solid #F3EEE4;color:#57534E;">{{ r.label }}</td>
-                <td style="text-align:right;padding:9px 12px;border-bottom:1px solid #F3EEE4;font-variant-numeric:tabular-nums;color:{{ r.gColor }};">{{ r.gentry }}</td>
-                <td style="text-align:right;padding:9px 12px;border-bottom:1px solid #F3EEE4;font-variant-numeric:tabular-nums;color:{{ r.oColor }};">{{ r.onetime }}</td>
-              </tr>
-            </sc-for>
-          </tbody>
-        </table>
-      </div>
-
-      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:10px;">
-        <h3 style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin:0;">Sales detail · {{ salesYearLabel }} <span style="color:#A8A29E;font-weight:400;font-size:13px;">({{ salesCount }})</span></h3>
-        <button onClick="{{ goLogSale }}" style="margin-left:auto;background:#B08D3E;color:#fff;border:none;border-radius:9px;padding:9px 15px;font-size:13px;font-weight:600;">+ Log a sale</button>
-      </div>
-      <div class="wi-scroll" style="overflow:auto;max-height:560px;background:#fff;border:1px solid #EDE6DA;border-radius:12px;">
-        <table style="width:100%;min-width:900px;font-size:13px;">
-          <thead><tr>
-            <th style="position:sticky;top:0;text-align:left;padding:10px 14px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Date sold</th>
-            <th style="position:sticky;top:0;text-align:left;padding:10px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Watch</th>
-            <th style="position:sticky;top:0;text-align:left;padding:10px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Brand</th>
-            <th style="position:sticky;top:0;text-align:left;padding:10px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Ref</th>
-            <th style="position:sticky;top:0;text-align:left;padding:10px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Inclusions</th>
-            <th style="position:sticky;top:0;text-align:left;padding:10px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Channel</th>
-            <th style="position:sticky;top:0;text-align:right;padding:10px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Sale price</th>
-            <th style="position:sticky;top:0;text-align:right;padding:10px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Cost</th>
-            <th style="position:sticky;top:0;text-align:right;padding:10px 14px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Profit</th>
-          </tr></thead>
-          <tbody>
-            <sc-for list="{{ saleRows }}" as="r" hint-placeholder-count="5">
-              <tr>
-                <td style="text-align:left;padding:9px 14px;border-bottom:1px solid #F3EEE4;color:#57534E;font-variant-numeric:tabular-nums;white-space:nowrap;">{{ r.date }}<sc-if value="{{ r.auto }}" hint-placeholder-val="{{ false }}"><span style="display:inline-block;margin-left:6px;font-size:9px;letter-spacing:.04em;padding:1px 5px;border-radius:4px;background:#F1EADD;color:#9a7b2e;vertical-align:middle;">AUTO</span></sc-if></td>
-                <td style="text-align:left;padding:9px 12px;border-bottom:1px solid #F3EEE4;max-width:260px;"><div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ r.watch }}</div></td>
-                <td style="text-align:left;padding:9px 12px;border-bottom:1px solid #F3EEE4;color:#57534E;">{{ r.brand }}</td>
-                <td style="text-align:left;padding:9px 12px;border-bottom:1px solid #F3EEE4;color:#78716C;font-variant-numeric:tabular-nums;">{{ r.ref }}</td>
-                <td style="text-align:left;padding:9px 12px;border-bottom:1px solid #F3EEE4;">
-                  <div style="display:flex;flex-wrap:wrap;gap:4px;">
-                    <sc-for list="{{ r.incl }}" as="c" hint-placeholder-count="1">
-                      <span style="display:inline-block;font-size:10px;padding:1px 6px;border-radius:4px;background:#F1EADD;color:#6b5318;white-space:nowrap;">{{ c }}</span>
-                    </sc-for>
-                  </div>
-                </td>
-                <td style="text-align:left;padding:9px 12px;border-bottom:1px solid #F3EEE4;color:#78716C;">{{ r.channel }}</td>
-                <td style="text-align:right;padding:9px 12px;border-bottom:1px solid #F3EEE4;font-weight:600;font-variant-numeric:tabular-nums;">{{ r.price }}</td>
-                <td style="text-align:right;padding:9px 12px;border-bottom:1px solid #F3EEE4;color:#78716C;font-variant-numeric:tabular-nums;">{{ r.cost }}</td>
-                <td style="{{ r.profitStyle }}">{{ r.profit }}</td>
-              </tr>
-            </sc-for>
-            <sc-if value="{{ salesEmpty }}" hint-placeholder-val="{{ false }}">
-              <tr><td colspan="9" style="padding:34px 20px;text-align:center;color:#A8A29E;font-size:13px;line-height:1.6;">No sales recorded for {{ salesYearLabel }} yet.<br>Sales appear here <b style="color:#78716C;">automatically</b> when a watch leaves Gentry or 1TimePiece inventory — or use <b style="color:#9a7b2e;">+ Log a sale</b> to record one by hand.</td></tr>
-            </sc-if>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    </sc-if>
-
-    <!-- ════════ PRICE ARCHIVE ════════ -->
-    <sc-if value="{{ showArchive }}" hint-placeholder-val="{{ false }}">
-    <div>
-      <h2 style="font-family:'Playfair Display',serif;font-size:25px;font-weight:600;margin:0 0 3px;">Price Archive</h2>
-      <p style="color:#78716C;font-size:13px;margin:0 0 18px;max-width:680px;">Your permanent price book. Log what you buy, sell, or quote — then look up any reference to see its history and a suggested buy-in. Saved in this browser; export anytime for a portable backup.</p>
-
-      <!-- lookup -->
-      <div style="background:#1C1917;color:#fff;border-radius:14px;padding:20px 22px;margin-bottom:22px;">
-        <div style="font-family:'Playfair Display',serif;font-size:17px;margin-bottom:4px;">Deal check</div>
-        <div style="font-size:12.5px;color:#B6ADA0;margin-bottom:12px;">Someone's offering you a watch? Type the model or reference to pull every comp — archive + both live sources.</div>
-        <input value="{{ lookupQuery }}" onInput="{{ onLookup }}" placeholder="e.g. 126710BLRO, Daytona, Nautilus…" style="width:100%;border:1px solid #3A3531;background:#262220;color:#fff;border-radius:9px;padding:11px 13px;font-size:14px;margin-bottom:14px;">
-        <sc-if value="{{ hasLookup }}" hint-placeholder-val="{{ false }}">
-          <div>
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:14px;">
-              <sc-for list="{{ lookupStats }}" as="s" hint-placeholder-count="4">
-                <div style="background:#262220;border:1px solid #3A3531;border-radius:10px;padding:11px 13px;">
-                  <div style="font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:#9C938A;">{{ s.label }}</div>
-                  <div style="font-family:'Playfair Display',serif;font-size:20px;margin-top:3px;color:{{ s.color }};">{{ s.value }}</div>
-                  <div style="font-size:11px;color:#9C938A;">{{ s.sub }}</div>
-                </div>
-              </sc-for>
-            </div>
-            <div style="background:#2A2420;border:1px solid #4A3B22;border-radius:10px;padding:12px 14px;margin-bottom:14px;">
-              <div style="font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:#D8B978;margin-bottom:8px;">Suggested buy-in vs lowest live ask ({{ lowestAsk }})</div>
-              <div style="display:flex;flex-wrap:wrap;gap:18px;">
-                <sc-for list="{{ buyTiers }}" as="t" hint-placeholder-count="3">
-                  <div><span style="font-size:12px;color:#B6ADA0;">{{ t.label }} margin → buy under </span><span style="font-weight:700;color:#fff;">{{ t.price }}</span></div>
-                </sc-for>
-              </div>
-            </div>
-            <div style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#9C938A;margin-bottom:7px;">{{ lookupCount }} comps</div>
-            <div class="wi-scroll" style="max-height:230px;overflow:auto;">
-              <table style="width:100%;font-size:12.5px;">
-                <sc-for list="{{ lookupRows }}" as="r" hint-placeholder-count="4">
-                  <tr>
-                    <td style="text-align:left;padding:6px 8px;border-bottom:1px solid #322D29;color:#E7E1D8;max-width:300px;"><div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ r.name }}</div></td>
-                    <td style="text-align:left;padding:6px 8px;border-bottom:1px solid #322D29;"><span style="{{ r.tagStyle }}">{{ r.tag }}</span></td>
-                    <td style="text-align:right;padding:6px 8px;border-bottom:1px solid #322D29;color:#9C938A;">{{ r.date }}</td>
-                    <td style="text-align:right;padding:6px 8px;border-bottom:1px solid #322D29;font-weight:600;color:#fff;font-variant-numeric:tabular-nums;">{{ r.price }}</td>
-                  </tr>
-                </sc-for>
-              </table>
-            </div>
-          </div>
-        </sc-if>
-        <sc-if value="{{ lookupEmpty }}" hint-placeholder-val="{{ false }}">
-          <div style="color:#9C938A;font-size:13px;padding:6px 0;">No comps found for “{{ lookupQuery }}”. Try a shorter reference or model name.</div>
-        </sc-if>
-      </div>
-
-      <!-- toolbar -->
-      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:14px;">
-        <button onClick="{{ toggleForm }}" style="background:#B08D3E;color:#fff;border:none;border-radius:9px;padding:9px 15px;font-size:13px;font-weight:600;">+ Add entry</button>
-        <button onClick="{{ logMarket }}" style="background:#fff;color:#1C1917;border:1px solid #E2DACB;border-radius:9px;padding:9px 15px;font-size:13px;font-weight:600;">Log today's market</button>
-        <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;">
-          <input value="{{ archiveSearch }}" onInput="{{ onArchiveSearch }}" placeholder="Filter archive…" style="border:1px solid #E2DACB;border-radius:8px;padding:7px 11px;width:170px;background:#fff;">
-          <button onClick="{{ exportJSON }}" style="background:#fff;color:#57534E;border:1px solid #E2DACB;border-radius:8px;padding:7px 12px;font-size:12.5px;">Export JSON</button>
-          <button onClick="{{ exportCSV }}" style="background:#fff;color:#57534E;border:1px solid #E2DACB;border-radius:8px;padding:7px 12px;font-size:12.5px;">Export CSV</button>
-          <label style="background:#fff;color:#57534E;border:1px solid #E2DACB;border-radius:8px;padding:7px 12px;font-size:12.5px;cursor:pointer;">Import<input type="file" accept="application/json" onChange="{{ importJSON }}" style="display:none;"></label>
-        </div>
-      </div>
-
-      <!-- add form -->
-      <sc-if value="{{ showForm }}" hint-placeholder-val="{{ false }}">
-        <div style="background:#fff;border:1px solid #E2DACB;border-radius:12px;padding:18px;margin-bottom:18px;">
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;">
-            <label style="font-size:11px;color:#78716C;">Kind
-              <select data-field="kind" value="{{ form.kind }}" onChange="{{ onFormInput }}" style="display:block;width:100%;margin-top:4px;border:1px solid #E2DACB;border-radius:7px;padding:7px 9px;background:#fff;">
-                <option value="Bought">Bought (we paid)</option>
-                <option value="Sold">Sold (we sold)</option>
-                <option value="Offer">Offer received</option>
-                <option value="Asking">Asking / comp</option>
-              </select>
-            </label>
-            <label style="font-size:11px;color:#78716C;">Brand<input data-field="brand" value="{{ form.brand }}" onInput="{{ onFormInput }}" placeholder="Rolex" style="display:block;width:100%;margin-top:4px;border:1px solid #E2DACB;border-radius:7px;padding:7px 9px;"></label>
-            <label style="font-size:11px;color:#78716C;">Model<input data-field="model" value="{{ form.model }}" onInput="{{ onFormInput }}" placeholder="GMT-Master II Batman" style="display:block;width:100%;margin-top:4px;border:1px solid #E2DACB;border-radius:7px;padding:7px 9px;"></label>
-            <label style="font-size:11px;color:#78716C;">Reference<input data-field="ref" value="{{ form.ref }}" onInput="{{ onFormInput }}" placeholder="126710BLNR" style="display:block;width:100%;margin-top:4px;border:1px solid #E2DACB;border-radius:7px;padding:7px 9px;"></label>
-            <label style="font-size:11px;color:#78716C;">Year<input data-field="year" value="{{ form.year }}" onInput="{{ onFormInput }}" placeholder="2023" style="display:block;width:100%;margin-top:4px;border:1px solid #E2DACB;border-radius:7px;padding:7px 9px;"></label>
-            <label style="font-size:11px;color:#78716C;">Condition<input data-field="cond" value="{{ form.cond }}" onInput="{{ onFormInput }}" placeholder="Mint / full set" style="display:block;width:100%;margin-top:4px;border:1px solid #E2DACB;border-radius:7px;padding:7px 9px;"></label>
-            <label style="font-size:11px;color:#78716C;">Price ₱<input data-field="price" value="{{ form.price }}" onInput="{{ onFormInput }}" placeholder="1010000" style="display:block;width:100%;margin-top:4px;border:1px solid #E2DACB;border-radius:7px;padding:7px 9px;"></label>
-            <label style="font-size:11px;color:#78716C;">Date<input data-field="date" type="date" value="{{ form.date }}" onInput="{{ onFormInput }}" style="display:block;width:100%;margin-top:4px;border:1px solid #E2DACB;border-radius:7px;padding:7px 9px;"></label>
-            <label style="font-size:11px;color:#78716C;">Cost ₱ <span style="color:#A8A29E;">(what we paid)</span><input data-field="cost" value="{{ form.cost }}" onInput="{{ onFormInput }}" placeholder="for profit on sales" style="display:block;width:100%;margin-top:4px;border:1px solid #E2DACB;border-radius:7px;padding:7px 9px;"></label>
-            <label style="font-size:11px;color:#78716C;">Source / partner<input data-field="source" value="{{ form.source }}" onInput="{{ onFormInput }}" placeholder="Walk-in, Partner 3…" style="display:block;width:100%;margin-top:4px;border:1px solid #E2DACB;border-radius:7px;padding:7px 9px;"></label>
-            <label style="font-size:11px;color:#78716C;">Inclusions<input data-field="incl" value="{{ form.incl }}" onInput="{{ onFormInput }}" placeholder="Box, Papers, Manuals" style="display:block;width:100%;margin-top:4px;border:1px solid #E2DACB;border-radius:7px;padding:7px 9px;"></label>
-            <label style="font-size:11px;color:#78716C;grid-column:1/-1;">Notes<input data-field="notes" value="{{ form.notes }}" onInput="{{ onFormInput }}" placeholder="anything worth remembering" style="display:block;width:100%;margin-top:4px;border:1px solid #E2DACB;border-radius:7px;padding:7px 9px;"></label>
-          </div>
-          <div style="display:flex;gap:8px;margin-top:14px;">
-            <button onClick="{{ saveRecord }}" style="background:#1C1917;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;">Save to archive</button>
-            <button onClick="{{ toggleForm }}" style="background:none;color:#78716C;border:1px solid #E2DACB;border-radius:8px;padding:9px 16px;font-size:13px;">Cancel</button>
-          </div>
-        </div>
-      </sc-if>
-
-      <div style="font-size:12px;color:#78716C;margin-bottom:8px;">{{ archiveCountText }}</div>
-      <div class="wi-scroll" style="overflow:auto;max-height:560px;background:#fff;border:1px solid #EDE6DA;border-radius:12px;">
-        <table style="width:100%;min-width:820px;font-size:13px;">
-          <thead><tr>
-            <th style="position:sticky;top:0;text-align:left;padding:10px 14px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Date</th>
-            <th style="position:sticky;top:0;text-align:left;padding:10px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Kind</th>
-            <th style="position:sticky;top:0;text-align:left;padding:10px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Watch</th>
-            <th style="position:sticky;top:0;text-align:left;padding:10px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Ref</th>
-            <th style="position:sticky;top:0;text-align:left;padding:10px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Source</th>
-            <th style="position:sticky;top:0;text-align:left;padding:10px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Inclusions</th>
-            <th style="position:sticky;top:0;text-align:right;padding:10px 14px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#78716C;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;">Price</th>
-            <th style="position:sticky;top:0;padding:10px 8px;background:#FCFAF6;border-bottom:1px solid #EDE6DA;z-index:1;"></th>
-          </tr></thead>
-          <tbody>
-            <sc-for list="{{ archiveRows }}" as="r" hint-placeholder-count="4">
-              <tr>
-                <td style="text-align:left;padding:9px 14px;border-bottom:1px solid #F3EEE4;color:#78716C;font-variant-numeric:tabular-nums;white-space:nowrap;">{{ r.date }}</td>
-                <td style="text-align:left;padding:9px 12px;border-bottom:1px solid #F3EEE4;"><span style="{{ r.tagStyle }}">{{ r.kind }}</span></td>
-                <td style="text-align:left;padding:9px 12px;border-bottom:1px solid #F3EEE4;max-width:300px;"><div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ r.watch }}</div></td>
-                <td style="text-align:left;padding:9px 12px;border-bottom:1px solid #F3EEE4;color:#78716C;font-variant-numeric:tabular-nums;">{{ r.ref }}</td>
-                <td style="text-align:left;padding:9px 12px;border-bottom:1px solid #F3EEE4;color:#78716C;">{{ r.source }}</td>
-                <td style="text-align:left;padding:9px 12px;border-bottom:1px solid #F3EEE4;">
-                  <div style="display:flex;flex-wrap:wrap;gap:4px;">
-                    <sc-for list="{{ r.incl }}" as="c" hint-placeholder-count="1">
-                      <span style="display:inline-block;font-size:10px;padding:1px 6px;border-radius:4px;background:#F1EADD;color:#6b5318;white-space:nowrap;">{{ c }}</span>
-                    </sc-for>
-                  </div>
-                </td>
-                <td style="text-align:right;padding:9px 14px;border-bottom:1px solid #F3EEE4;font-weight:600;font-variant-numeric:tabular-nums;">{{ r.price }}</td>
-                <td style="text-align:center;padding:9px 8px;border-bottom:1px solid #F3EEE4;"><button onClick="{{ r.onDelete }}" title="Delete" style="background:none;border:none;color:#C4BCB0;font-size:15px;padding:2px 6px;">×</button></td>
-              </tr>
-            </sc-for>
-            <sc-if value="{{ archiveEmpty }}" hint-placeholder-val="{{ false }}">
-              <tr><td colspan="8" style="padding:30px;text-align:center;color:#A8A29E;font-size:13px;">No entries yet. Add a deal, or “Log today's market” to seed the book with current comps.</td></tr>
-            </sc-if>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    </sc-if>
-
-  </main>
-</div>
-
-</x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1240,&quot;height&quot;:900}}">
-class Component extends DCLogic {
-  state = {
-    loading: true, error: null, data: null, mod: null, refreshing: false,
-    tab: 'overview', salesYear: null,
-    gentrySearch: '', gentrySort: 'value',
-    oneSearch: '', onePartner: 'all', oneSort: 'value',
-    archive: [], archiveSearch: '', showForm: false, lookupQuery: '',
-    form: this.blankForm(),
-  };
-
-  blankForm() {
-    const d = new Date(Date.now() + 8 * 3600 * 1000).toISOString().slice(0, 10);
-    return { kind: 'Bought', brand: '', model: '', ref: '', year: '', cond: '', price: '', cost: '', incl: '', date: d, source: '', notes: '' };
-  }
-
-  peso(n) {
-    if (n == null || isNaN(n)) return '—';
-    return '₱' + (n >= 1e9 ? (n / 1e9).toFixed(2) + 'B' : n >= 1e6 ? (n / 1e6).toFixed(2) + 'M' : n >= 1e3 ? (n / 1e3).toFixed(0) + 'K' : Math.round(n));
-  }
-  full(n) { return (n == null || isNaN(n)) ? '—' : '₱' + Math.round(n).toLocaleString(); }
-  normRef(s) { return (s || '').toUpperCase().replace(/[^0-9A-Z]/g, ''); }
-  partnerLabel(code) { return !code || code === 'Unassigned' ? 'Unassigned' : 'Partner ' + code; }
-
-  async componentDidMount() {
-    // load archive: localStorage merged over seed file
-    let arch = [];
-    try { const r = await fetch('./price-archive.json'); if (r.ok) arch = await r.json(); } catch (e) {}
-    try { const ls = JSON.parse(localStorage.getItem('wi_archive_v1')); if (Array.isArray(ls)) arch = ls; } catch (e) {}
-    this.setState({ archive: Array.isArray(arch) ? arch : [] });
-    this.load(false);
-  }
-
-  async load(force) {
-    this.setState({ refreshing: true, error: null });
-    try {
-      const mod = this.state.mod || await import(new URL('watch-data.js', location.href).href);
-      const data = await mod.fetchAll(force);
-      if (data.autoSold && data.autoSold.length) this.mergeAutoSold(data.autoSold);
-      this.setState({ mod, data, loading: false, refreshing: false });
-    } catch (e) {
-      this.setState({ error: String(e && e.message || e), loading: false, refreshing: false });
-    }
-  }
-  refresh = () => this.load(true);
-  setTab(t) { this.setState({ tab: t }); }
-
-  // ── archive persistence ──
-  persist(arch) { try { localStorage.setItem('wi_archive_v1', JSON.stringify(arch)); } catch (e) {} }
-  // merge inventory-disappearance sales detected by the data engine, deduped by source key
-  mergeAutoSold(list) {
-    const seen = new Set(this.state.archive.filter(r => r.srcKey).map(r => r.srcKey));
-    const add = list.filter(r => r.srcKey && !seen.has(r.srcKey));
-    if (!add.length) return;
-    const arch = [...add, ...this.state.archive];
-    this.persist(arch);
-    this.setState({ archive: arch });
-  }
-  saveRecord = () => {
-    const f = this.state.form;
-    if (!f.model && !f.ref && !f.brand) return;
-    const rec = {
-      id: 'r' + Date.now() + Math.random().toString(36).slice(2, 6),
-      kind: f.kind, brand: f.brand.trim(), model: f.model.trim(),
-      ref: f.ref.trim(), year: f.year.trim(), cond: f.cond.trim(),
-      price: f.price ? parseInt(String(f.price).replace(/[^0-9]/g, ''), 10) : null,
-      cost: f.cost ? parseInt(String(f.cost).replace(/[^0-9]/g, ''), 10) : null,
-      incl: f.incl ? f.incl.split(/[,/]+/).map(x => x.trim()).filter(Boolean) : [],
-      date: f.date, source: f.source.trim(), notes: f.notes.trim(),
-    };
-    const arch = [rec, ...this.state.archive];
-    this.persist(arch);
-    this.setState({ archive: arch, showForm: false, form: this.blankForm() });
-  };
-  deleteRecord(id) {
-    const arch = this.state.archive.filter(r => r.id !== id);
-    this.persist(arch);
-    this.setState({ archive: arch });
-  }
-  logMarket = () => {
-    const d = this.state.data; if (!d) return;
-    const day = new Date(Date.now() + 8 * 3600 * 1000).toISOString().slice(0, 10);
-    const existing = new Set(this.state.archive.map(r => r.id));
-    const mk = (w, src) => ({
-      id: 'm' + day + '|' + src + '|' + this.normRef(w.ref || w.name) + '|' + (w.price || 0),
-      kind: 'Asking', brand: w.brand || '', model: w.name || '', ref: w.ref || '',
-      year: w.year || '', cond: w.cond || '', price: w.price || null, cost: null,
-      incl: w.incl || [],
-      date: day, source: src + (w.partner ? ' · Partner ' + w.partner : ''), notes: 'auto market snapshot',
-    });
-    const fresh = [];
-    d.gentry.forEach(w => { if (w.price) fresh.push(mk(w, 'Gentry')); });
-    d.onetime.forEach(w => { if (w.price) fresh.push(mk(w, '1TimePiece')); });
-    const dedup = fresh.filter(r => !existing.has(r.id));
-    const arch = [...dedup, ...this.state.archive];
-    this.persist(arch);
-    this.setState({ archive: arch });
-  };
-  clearArchive = () => { if (confirm('Erase the entire archive? Export first if unsure.')) { this.persist([]); this.setState({ archive: [] }); } };
-
-  download(name, text, type) {
-    const blob = new Blob([text], { type });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = name;
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 2000);
-  }
-  exportJSON = () => this.download('price-archive.json', JSON.stringify(this.state.archive, null, 2), 'application/json');
-  exportCSV = () => {
-    const cols = ['date', 'kind', 'brand', 'model', 'ref', 'year', 'cond', 'incl', 'price', 'cost', 'source', 'notes'];
-    const esc = v => '"' + String(v == null ? '' : (Array.isArray(v) ? v.join(' / ') : v)).replace(/"/g, '""') + '"';
-    const rows = [cols.join(',')].concat(this.state.archive.map(r => cols.map(c => esc(r[c])).join(',')));
-    this.download('price-archive.csv', rows.join('\n'), 'text/csv');
-  };
-  importJSON = (e) => {
-    const file = e.target.files && e.target.files[0]; if (!file) return;
-    const fr = new FileReader();
-    fr.onload = () => {
-      try {
-        const arr = JSON.parse(fr.result);
-        if (Array.isArray(arr)) {
-          const byId = {}; [...arr, ...this.state.archive].forEach(r => { if (r && r.id) byId[r.id] = r; });
-          const merged = Object.values(byId);
-          this.persist(merged); this.setState({ archive: merged });
-        }
-      } catch (err) { alert('Could not read that file.'); }
-    };
-    fr.readAsText(file);
-  };
-
-  // ── input handlers ──
-  onFormInput = (e) => { const f = e.target.dataset.field; this.setState({ form: { ...this.state.form, [f]: e.target.value } }); };
-  toggleForm = () => this.setState({ showForm: !this.state.showForm });
-
-  navStyle(id) {
-    const a = this.state.tab === id;
-    return 'padding:6px 1px;background:none;border:none;font-size:14px;color:' + (a ? '#1C1917' : '#78716C') +
-      ';border-bottom:2px solid ' + (a ? '#B08D3E' : 'transparent') + ';font-weight:' + (a ? '600' : '400') + ';white-space:nowrap;';
-  }
-
-  partnerColor(code) {
-    const map = { '1': '#B08D3E', '2': '#1D4ED8', '3': '#9F1239', '4': '#3F6212', '5': '#7C3AED', '6': '#0E7490' };
-    return map[code] || '#A8A29E';
-  }
-
-  filterSort(items, search, sort) {
-    const q = (search || '').trim().toLowerCase();
-    let arr = items;
-    if (q) arr = items.filter(w => (w.name + ' ' + (w.ref || '') + ' ' + w.brand).toLowerCase().includes(q));
-    const v = w => (w.price == null ? -1 : w.price);
-    arr = arr.slice();
-    if (sort === 'value') arr.sort((a, b) => v(b) - v(a));
-    else if (sort === 'value_asc') arr.sort((a, b) => v(a) - v(b));
-    else if (sort === 'name') arr.sort((a, b) => a.name.localeCompare(b.name));
-    else if (sort === 'brand') arr.sort((a, b) => a.brand.localeCompare(b.brand) || v(b) - v(a));
-    else if (sort === 'year') arr.sort((a, b) => (b.year || '').localeCompare(a.year || ''));
-    return arr;
-  }
-
-  comps(query) {
-    const q = (query || '').trim().toLowerCase();
-    if (!q) return [];
-    const nq = this.normRef(query);
-    const match = (name, ref) => {
-      const hay = (name || '').toLowerCase();
-      if (hay.includes(q)) return true;
-      if (nq.length >= 3 && this.normRef(ref).includes(nq)) return true;
-      return false;
-    };
-    const out = [];
-    const d = this.state.data;
-    if (d) {
-      d.gentry.forEach(w => { if (w.price && match(w.name, w.ref)) out.push({ name: w.name, tag: 'Gentry', date: 'live', price: w.price }); });
-      d.onetime.forEach(w => { if (w.price && match(w.name, w.ref)) out.push({ name: w.name, tag: '1TP' + (w.partner ? ' P' + w.partner : ''), date: 'live', price: w.price }); });
-    }
-    this.state.archive.forEach(r => { if (r.price && match(r.model + ' ' + r.brand, r.ref)) out.push({ name: (r.brand + ' ' + r.model).trim(), tag: r.kind, date: r.date, price: r.price }); });
-    return out;
-  }
-
-  tagStyle(tag) {
-    const base = 'display:inline-block;font-size:10px;padding:2px 7px;border-radius:99px;letter-spacing:.02em;white-space:nowrap;';
-    const m = {
-      Bought: 'background:#DCEAD0;color:#3F6212;', Sold: 'background:#FCE7EB;color:#9F1239;',
-      Offer: 'background:#E0E7FF;color:#3730A3;', Asking: 'background:#EFE7D5;color:#6b5318;',
-      Gentry: 'background:#EFE7D5;color:#6b5318;',
-    };
-    let key = tag; if (tag && tag.startsWith('1TP')) key = 'Asking';
-    return base + (m[key] || 'background:#EFE7D5;color:#6b5318;');
-  }
-
-  renderVals() {
-    const s = this.state;
-    const navOverview = this.navStyle('overview'), navGentry = this.navStyle('gentry'),
-      navOnetime = this.navStyle('onetime'), navSales = this.navStyle('sales'), navArchive = this.navStyle('archive');
-    const base = {
-      navOverview, navGentry, navOnetime, navSales, navArchive,
-      goOverview: () => this.setTab('overview'), goGentry: () => this.setTab('gentry'),
-      goOnetime: () => this.setTab('onetime'), goSales: () => this.setTab('sales'), goArchive: () => this.setTab('archive'),
-      refresh: this.refresh,
-      refreshLabel: s.refreshing ? 'Refreshing…' : 'Refresh',
-      spinStyle: 'display:inline-block;' + (s.refreshing ? 'animation:wi-spin .8s linear infinite;' : ''),
-      showLoading: s.loading && !s.data, showError: !!s.error && !s.data, errorMsg: s.error || '',
-      stale: !!(s.data && s.data.stale),
-      showOverview: false, showGentry: false, showOnetime: false, showSales: s.tab === 'sales', showArchive: s.tab === 'archive',
-      updatedText: s.data ? ('Updated ' + s.data.generatedAt + ' PHT · auto-refresh 6h') : 'Loading…',
-    };
-    // archive + sales views are computable from the archive alone (no market data needed)
-    Object.assign(base, this.archiveVals());
-    Object.assign(base, this.salesVals());
-
-    if (!s.data) return base;
-    const d = s.data, ag = d.agg;
-    const showContent = !s.loading;
-    base.showOverview = showContent && s.tab === 'overview';
-    base.showGentry = showContent && s.tab === 'gentry';
-    base.showOnetime = showContent && s.tab === 'onetime';
-
-    // KPIs — with day-over-day deltas vs the latest committed history day before today
-    const histAll = (s.mod ? s.mod.getHistory() : []) || [];
-    const todayStr = new Date(Date.now() + 8 * 3600 * 1000).toISOString().slice(0, 10);
-    const baseRow = histAll.filter(h => h && h.d && h.d < todayStr).slice(-1)[0] || null;
-    const chg = (nowV, wasV) => {
-      if (wasV == null || !isFinite(wasV) || !baseRow) return { change: '', changeColor: '#A8A29E' };
-      const diff = nowV - wasV;
-      if (!diff) return { change: 'no change vs ' + baseRow.d.slice(5), changeColor: '#A8A29E' };
-      return { change: (diff > 0 ? '▲ ' : '▼ ') + this.peso(Math.abs(diff)) + ' vs ' + baseRow.d.slice(5), changeColor: diff > 0 ? '#3F6212' : '#9F1239' };
-    };
-    const combinedNow = ag.gentry.value + ag.onetime.value;
-    base.overviewKpis = [
-      { label: 'Combined value', value: this.peso(combinedNow), delta: (ag.gentry.count + ag.onetime.count) + ' pieces tracked', ...chg(combinedNow, baseRow ? baseRow.gv + baseRow.ov : null) },
-      { label: 'Gentry stock', value: this.peso(ag.gentry.value), delta: ag.gentry.count + ' watches', ...chg(ag.gentry.value, baseRow ? baseRow.gv : null) },
-      { label: '1TimePiece stock', value: this.peso(ag.onetime.value), delta: ag.onetime.count + ' watches', ...chg(ag.onetime.value, baseRow ? baseRow.ov : null) },
-      { label: 'Partners', value: String(ag.onetime.byPartner.length), delta: ag.onetime.byBrand.length + ' brands listed', change: '', changeColor: '#A8A29E' },
-    ];
-    base.sourceRows = [
-      { name: 'Gentry Timepieces', count: ag.gentry.count.toLocaleString(), value: this.full(ag.gentry.value), avg: this.peso(ag.gentry.avg), brands: ag.gentry.byBrand.length, note: 'own retail' },
-      { name: '1TimePiece', count: ag.onetime.count.toLocaleString(), value: this.full(ag.onetime.value), avg: this.peso(ag.onetime.avg), brands: ag.onetime.byBrand.length, note: ag.onetime.held + ' on hold · ' + ag.onetime.byPartner.length + ' partners' },
-    ];
-
-    // Cockpit — recent sales activity + sell-through (uses the shared sales ledger)
-    const soldAll = (s.archive || []).filter(r => r.kind === 'Sold');
-    const dayMs = 86400000, tnow = Date.now();
-    const parseD = d => { const t = Date.parse((d || '') + 'T00:00:00+08:00'); return isNaN(t) ? null : t; };
-    const sumP = arr => arr.reduce((a, r) => a + (r.price || 0), 0);
-    const win = days => soldAll.filter(r => { const t = parseD(r.date); return t != null && (tnow - t) <= days * dayMs; });
-    const w7 = win(7), w30 = win(30);
-    const cmNow = new Date(Date.now() + 8 * 3600 * 1000), cmY = cmNow.getUTCFullYear(), cmM = cmNow.getUTCMonth() + 1;
-    const wmtd = soldAll.filter(r => { const m = /^(\d{4})-(\d{2})/.exec(r.date || ''); return m && +m[1] === cmY && +m[2] === cmM; });
-    const invCount = ag.gentry.count + ag.onetime.count;
-    const st30 = (invCount + w30.length) ? Math.round((w30.length / (invCount + w30.length)) * 100) : 0;
-    const sLbl = n => n + (n === 1 ? ' sale' : ' sales');
-    base.overviewActivityCards = [
-      { label: 'Sold · 7 days', value: this.peso(sumP(w7)), delta: sLbl(w7.length) },
-      { label: 'Sold · 30 days', value: this.peso(sumP(w30)), delta: sLbl(w30.length) },
-      { label: 'Sold · MTD', value: this.peso(sumP(wmtd)), delta: sLbl(wmtd.length) },
-      { label: 'Sell-through · 30d', value: st30 + '%', delta: 'of listed + sold' },
-    ];
-    const latest = soldAll.slice().sort((a, b) => (a.date < b.date ? 1 : -1)).slice(0, 6);
-    base.overviewHasSales = latest.length > 0;
-    base.overviewNoSales = latest.length === 0;
-    base.overviewLatestSales = latest.map(r => ({
-      date: r.date || '—',
-      title: (r.brand ? r.brand + ' ' : '') + (r.model || 'watch'),
-      channel: r.source || '—',
-      price: this.full(r.price),
-    }));
-
-    const barRows = (list, color) => {
-      const max = list.reduce((m, x) => Math.max(m, x.v), 1);
-      return list.map(x => ({
-        key: x.key, n: x.n, vshort: this.peso(x.v),
-        barStyle: 'height:100%;border-radius:99px;background:' + color + ';width:' + Math.max(2, (x.v / max) * 100) + '%;',
-      }));
-    };
-    base.gBrandRows = barRows(ag.gentry.byBrand, '#B08D3E');
-    base.oBrandRows = barRows(ag.onetime.byBrand, '#1C1917');
-
-    // history bars
-    const hist = (s.mod ? s.mod.getHistory() : []) || [];
-    base.hasHistory = hist.length > 1;
-    base.noHistory = hist.length <= 1;
-    if (hist.length > 1) {
-      const maxv = hist.reduce((m, h) => Math.max(m, h.gv + h.ov), 1);
-      const recent = hist.slice(-14);
-      base.historyBars = recent.map(h => {
-        const tot = h.gv + h.ov;
-        return {
-          label: h.d.slice(5), title: h.d + ' · ' + this.full(tot),
-          barStyle: 'width:100%;border-radius:5px 5px 0 0;background:linear-gradient(#C9A752,#B08D3E);height:' + Math.max(4, (tot / maxv) * 120) + 'px;',
-        };
-      });
-    } else base.historyBars = [];
-
-    // Gentry tab
-    base.gentryKpis = [
-      { label: 'Inventory value', value: this.peso(ag.gentry.value), delta: this.full(ag.gentry.value) },
-      { label: 'Watches in stock', value: ag.gentry.count.toLocaleString(), delta: ag.gentry.byBrand.length + ' brands' },
-      { label: 'Average ticket', value: this.peso(ag.gentry.avg), delta: 'per watch' },
-      { label: 'Top brand', value: ag.gentry.byBrand[0] ? ag.gentry.byBrand[0].key : '—', delta: ag.gentry.byBrand[0] ? this.peso(ag.gentry.byBrand[0].v) : '' },
-    ];
-    const gl = this.filterSort(ag.gentry.items, s.gentrySearch, s.gentrySort);
-    base.gCount = gl.length;
-    base.gentrySearch = s.gentrySearch; base.gentrySort = s.gentrySort;
-    base.onGentrySearch = e => this.setState({ gentrySearch: e.target.value });
-    base.onGentrySort = e => this.setState({ gentrySort: e.target.value });
-    base.gListings = gl.slice(0, 400).map(w => ({
-      name: w.name, brand: w.brand, ref: w.ref || '—', year: w.year || '—',
-      incl: w.incl || [],
-      price: this.full(w.price), url: w.url, img: w.img || '',
-    }));
-
-    // 1TimePiece tab
-    base.onetimeKpis = [
-      { label: 'Inventory value', value: this.peso(ag.onetime.value), delta: this.full(ag.onetime.value) },
-      { label: 'Watches listed', value: ag.onetime.count.toLocaleString(), delta: ag.onetime.held + ' on hold' },
-      { label: 'Average ticket', value: this.peso(ag.onetime.avg), delta: 'per watch' },
-      { label: 'Partners', value: String(ag.onetime.byPartner.length), delta: 'consignors' },
-      { label: 'Top partner', value: ag.onetime.byPartner[0] ? this.partnerLabel(ag.onetime.byPartner[0].key) : '—', delta: ag.onetime.byPartner[0] ? this.peso(ag.onetime.byPartner[0].v) : '' },
-    ];
-    const ptot = ag.onetime.value || 1;
-    const pmax = ag.onetime.byPartner.reduce((m, x) => Math.max(m, x.v), 1);
-    base.partnerRows = ag.onetime.byPartner.map(p => {
-      const code = p.key === 'Unassigned' ? '' : p.key;
-      const col = this.partnerColor(code);
-      return {
-        label: this.partnerLabel(p.key), n: p.n, value: this.full(p.v), avg: this.peso(p.n ? p.v / p.n : 0),
-        share: ((p.v / ptot) * 100).toFixed(1) + '%',
-        rowStyle: '',
-        dotStyle: 'display:inline-block;width:8px;height:8px;border-radius:50%;background:' + col + ';margin-right:8px;vertical-align:middle;',
-        barStyle: 'height:100%;border-radius:99px;background:' + col + ';width:' + Math.max(2, (p.v / pmax) * 100) + '%;',
-      };
-    });
-    base.partnerOptions = [{ v: 'all', t: 'All partners' }].concat(
-      ag.onetime.byPartner.map(p => ({ v: p.key, t: this.partnerLabel(p.key) + ' (' + p.n + ')' })));
-    base.onePartner = s.onePartner; base.oneSearch = s.oneSearch; base.oneSort = s.oneSort;
-    base.onOneSearch = e => this.setState({ oneSearch: e.target.value });
-    base.onOnePartner = e => this.setState({ onePartner: e.target.value });
-    base.onOneSort = e => this.setState({ oneSort: e.target.value });
-    let oitems = ag.onetime.items;
-    if (s.onePartner !== 'all') oitems = oitems.filter(w => (w.partner || 'Unassigned') === s.onePartner);
-    const ol = this.filterSort(oitems, s.oneSearch, s.oneSort);
-    base.oCount = ol.length;
-    base.oListings = ol.slice(0, 500).map(w => {
-      const code = w.partner || '';
-      return {
-        name: w.name, brand: w.brand, ref: w.ref || '—',
-        partnerLabel: code ? 'P' + code : '—',
-        partnerStyle: code ? ('display:inline-block;min-width:26px;font-size:11px;font-weight:600;padding:2px 7px;border-radius:99px;color:#fff;background:' + this.partnerColor(code) + ';') : 'color:#C4BCB0;',
-        incl: w.incl || [],
-        price: w.status ? w.status : this.full(w.price),
-      };
-    });
-
-    return base;
-  }
-
-  archiveVals() {
-    const s = this.state;
-    const v = {
-      showForm: s.showForm, form: s.form, archiveSearch: s.archiveSearch, lookupQuery: s.lookupQuery,
-      toggleForm: this.toggleForm, onFormInput: this.onFormInput, saveRecord: this.saveRecord,
-      logMarket: this.logMarket, exportJSON: this.exportJSON, exportCSV: this.exportCSV, importJSON: this.importJSON,
-      onArchiveSearch: e => this.setState({ archiveSearch: e.target.value }),
-      onLookup: e => this.setState({ lookupQuery: e.target.value }),
-    };
-    // archive table
-    const q = (s.archiveSearch || '').trim().toLowerCase();
-    let rows = s.archive;
-    if (q) rows = rows.filter(r => ((r.brand || '') + ' ' + (r.model || '') + ' ' + (r.ref || '') + ' ' + (r.source || '') + ' ' + (r.kind || '')).toLowerCase().includes(q));
-    v.archiveEmpty = rows.length === 0;
-    v.archiveCountText = s.archive.length + ' entries' + (q ? ' · ' + rows.length + ' shown' : '') + ' · saved in this browser';
-    v.archiveRows = rows.slice(0, 600).map(r => ({
-      date: r.date || '—', kind: r.kind || '—', tagStyle: this.tagStyle(r.kind),
-      watch: ((r.brand || '') + ' ' + (r.model || '')).trim() || '—', ref: r.ref || '—',
-      source: r.source || '—', price: this.full(r.price),
-      incl: Array.isArray(r.incl) ? r.incl : (r.incl ? [r.incl] : []),
-      onDelete: () => this.deleteRecord(r.id),
-    }));
-
-    // lookup / deal check
-    const comps = this.comps(s.lookupQuery);
-    v.hasLookup = comps.length > 0;
-    v.lookupEmpty = !!(s.lookupQuery.trim()) && comps.length === 0;
-    if (comps.length) {
-      const prices = comps.map(c => c.price).sort((a, b) => a - b);
-      const min = prices[0], max = prices[prices.length - 1];
-      const med = prices[Math.floor(prices.length / 2)];
-      const lows = comps.filter(c => c.tag === 'Gentry' || (c.tag || '').startsWith('1TP')).map(c => c.price);
-      const lowestAsk = lows.length ? Math.min(...lows) : min;
-      v.lowestAsk = this.full(lowestAsk);
-      v.lookupCount = comps.length;
-      v.lookupStats = [
-        { label: 'Lowest', value: this.peso(min), sub: 'cheapest comp', color: '#7FB069' },
-        { label: 'Median', value: this.peso(med), sub: 'typical', color: '#fff' },
-        { label: 'Highest', value: this.peso(max), sub: 'top ask', color: '#E89B9B' },
-        { label: 'Comps', value: String(comps.length), sub: 'data points', color: '#D8B978' },
-      ];
-      v.buyTiers = [10, 15, 20].map(m => ({ label: m + '%', price: this.full(Math.round(lowestAsk / (1 + m / 100))) }));
-      v.lookupRows = comps.sort((a, b) => a.price - b.price).slice(0, 40).map(c => ({
-        name: c.name, tag: c.tag, tagStyle: this.tagStyle(c.tag), date: c.date, price: this.full(c.price),
-      }));
-    } else {
-      v.lookupStats = []; v.buyTiers = []; v.lookupRows = []; v.lowestAsk = '—'; v.lookupCount = 0;
-    }
-    return v;
-  }
-
-  salesVals() {
-    const s = this.state;
-    const MN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const now = new Date(Date.now() + 8 * 3600 * 1000);
-    const curY = now.getUTCFullYear(), curM = now.getUTCMonth() + 1;
-    const ym = d => { const m = /^(\d{4})-(\d{2})/.exec(d || ''); return m ? { y: +m[1], mo: +m[2] } : null; };
-    const sales = s.archive.filter(r => r.kind === 'Sold');
-    const selYear = s.salesYear || curY;
-
-    // year selector — known sale years plus a rolling current→+2 window
-    const yset = new Set([curY - 1, curY, curY + 1, curY + 2]);
-    sales.forEach(r => { const p = ym(r.date); if (p) yset.add(p.y); });
-    const yearsArr = [...yset].sort((a, b) => a - b);
-
-    // classify a sale by source: Gentry vs 1TimePiece (manual entries with other channels fall to 'other')
-    const srcKey = r => { const sc = r.source || ''; if (/^gentry/i.test(sc)) return 'gentry'; if (/1\s*time|1tp/i.test(sc)) return 'onetime'; return 'other'; };
-    const blankSrc = () => ({ mtdV: 0, mtdN: 0, ytdV: 0, ytdN: 0, yrV: 0, yrN: 0, yrProfit: 0, yrCost: 0 });
-    const SRC = { gentry: blankSrc(), onetime: blankSrc() };
-
-    const months = Array.from({ length: 12 }, () => ({ v: 0, n: 0, profit: 0, cost: 0 }));
-    let yrRev = 0, yrUnits = 0, yrProfit = 0, yrCostKnown = 0;
-    let mtdRev = 0, mtdN = 0, ytdRev = 0, ytdN = 0;
-    sales.forEach(r => {
-      const p = ym(r.date); if (!p) return;
-      const price = r.price || 0;
-      const cost = (r.cost != null && r.cost !== '') ? (+r.cost || 0) : null;
-      if (p.y === selYear) {
-        const mm = months[p.mo - 1]; mm.v += price; mm.n++;
-        yrRev += price; yrUnits++;
-        if (cost != null) { yrProfit += price - cost; yrCostKnown++; }
-      }
-      if (p.y === curY) { ytdRev += price; ytdN++; if (p.mo === curM) { mtdRev += price; mtdN++; } }
-      const x = SRC[srcKey(r)];
-      if (x) {
-        if (p.y === curY) { x.ytdV += price; x.ytdN++; if (p.mo === curM) { x.mtdV += price; x.mtdN++; } }
-        if (p.y === selYear) { x.yrV += price; x.yrN++; if (cost != null) { x.yrProfit += price - cost; x.yrCost++; } }
-      }
-    });
-    const maxv = months.reduce((m, x) => Math.max(m, x.v), 1);
-
-    const v = {};
-    const plural = n => n === 1 ? ' sale' : ' sales';
-    v.salesKpis = [
-      { label: 'Month to date', value: this.peso(mtdRev), delta: mtdN + plural(mtdN) + ' · ' + MN[curM - 1] + ' ' + curY, color: '#1C1917' },
-      { label: 'Year to date', value: this.peso(ytdRev), delta: ytdN + plural(ytdN) + ' · ' + curY, color: '#1C1917' },
-      { label: selYear + ' units sold', value: String(yrUnits), delta: 'watches', color: '#1C1917' },
-      { label: selYear + ' avg sale', value: yrUnits ? this.peso(yrRev / yrUnits) : '—', delta: 'per watch', color: '#1C1917' },
-      { label: selYear + ' profit', value: yrCostKnown ? this.peso(yrProfit) : '—', delta: yrCostKnown ? (yrCostKnown + ' with cost logged') : 'log cost to track', color: yrCostKnown ? (yrProfit >= 0 ? '#3F6212' : '#9F1239') : '#A8A29E' },
-    ];
-    v.monthBars = months.map((mm, i) => {
-      const active = (selYear === curY && i + 1 === curM);
-      const col = mm.v ? (active ? 'linear-gradient(#C9A752,#B08D3E)' : 'linear-gradient(#DcCfa9,#BBA877)') : '#EDE6DA';
-      return {
-        label: MN[i], valLabel: mm.v ? this.peso(mm.v) : '',
-        title: MN[i] + ' ' + selYear + ' · ' + this.full(mm.v) + ' · ' + mm.n + plural(mm.n),
-        barStyle: 'width:100%;border-radius:5px 5px 0 0;background:' + col + ';height:' + Math.max(2, (mm.v / maxv) * 120) + 'px;',
-      };
-    });
-    v.salesYearLabel = String(selYear);
-    v.salesYears = yearsArr.map(y => ({
-      label: String(y),
-      onClick: () => this.setState({ salesYear: y }),
-      style: 'background:' + (y === selYear ? '#1C1917' : '#fff') + ';color:' + (y === selYear ? '#fff' : '#57534E') + ';border:1px solid ' + (y === selYear ? '#1C1917' : '#E2DACB') + ';border-radius:8px;padding:6px 12px;font-size:12.5px;font-weight:600;',
-    }));
-
-    const yrSales = sales.filter(r => { const p = ym(r.date); return p && p.y === selYear; }).sort((a, b) => (a.date < b.date ? 1 : -1));
-    v.salesCount = yrSales.length;
-    v.salesEmpty = yrSales.length === 0;
-    const autoN = yrSales.filter(r => r.auto).length;
-    v.salesHasAuto = autoN > 0;
-    v.salesAutoNote = autoN + (autoN === 1 ? ' sale was' : ' sales were') + ' auto-detected from Gentry / 1TimePiece inventory changes — set the cost on each to track profit.';
-    v.saleRows = yrSales.slice(0, 600).map(r => {
-      const cost = (r.cost != null && r.cost !== '') ? (+r.cost || 0) : null;
-      const profit = cost != null ? (r.price || 0) - cost : null;
-      return {
-        date: r.date || '—', watch: r.model || ((r.brand || '') + ' watch'), brand: r.brand || '—', ref: r.ref || '—',
-        incl: Array.isArray(r.incl) ? r.incl : (r.incl ? [r.incl] : []),
-        channel: r.source || '—', price: this.full(r.price), cost: cost != null ? this.full(cost) : '—',
-        auto: !!r.auto,
-        profit: profit != null ? this.full(profit) : '—',
-        profitStyle: 'text-align:right;padding:9px 14px;border-bottom:1px solid #F3EEE4;font-weight:600;font-variant-numeric:tabular-nums;color:' + (profit == null ? '#A8A29E' : (profit >= 0 ? '#3F6212' : '#9F1239')) + ';',
-      };
-    });
-    // month-to-date side by side, per source
-    v.salesMtdMonthLabel = MN[curM - 1] + ' ' + curY;
-    const card = (key, name, dot) => {
-      const x = SRC[key];
-      return {
-        name, dot,
-        mtdV: this.peso(x.mtdV), mtdN: x.mtdN + plural(x.mtdN),
-        ytdV: this.peso(x.ytdV), ytdN: x.ytdN + plural(x.ytdN),
-      };
-    };
-    v.salesSourceCards = [card('gentry', 'Gentry', '#B08D3E'), card('onetime', '1TimePiece', '#1C1917')];
-
-    // selected-year breakdown, Gentry vs 1TimePiece side by side
-    const g = SRC.gentry, o = SRC.onetime;
-    const totYr = (g.yrV + o.yrV) || 1;
-    const pct = val => Math.round((val / totYr) * 100) + '%';
-    const profCol = (cnt, prof) => cnt ? (prof >= 0 ? '#3F6212' : '#9F1239') : '#A8A29E';
-    v.salesBreakdownRows = [
-      { label: 'Units sold', gentry: String(g.yrN), onetime: String(o.yrN), gColor: '#1C1917', oColor: '#1C1917' },
-      { label: 'Revenue', gentry: this.full(g.yrV), onetime: this.full(o.yrV), gColor: '#1C1917', oColor: '#1C1917' },
-      { label: 'Share of revenue', gentry: pct(g.yrV), onetime: pct(o.yrV), gColor: '#78716C', oColor: '#78716C' },
-      { label: 'Avg sale', gentry: g.yrN ? this.peso(g.yrV / g.yrN) : '—', onetime: o.yrN ? this.peso(o.yrV / o.yrN) : '—', gColor: '#1C1917', oColor: '#1C1917' },
-      { label: 'Profit (cost-logged)', gentry: g.yrCost ? this.full(g.yrProfit) : '—', onetime: o.yrCost ? this.full(o.yrProfit) : '—', gColor: profCol(g.yrCost, g.yrProfit), oColor: profCol(o.yrCost, o.yrProfit) },
-    ];
-
-    v.goLogSale = () => this.setState({ tab: 'archive', showForm: true, form: { ...this.blankForm(), kind: 'Sold' } });
-    return v;
+  // charts
+  const recent=hist.slice(-60); const labels=recent.map(h=>h.d.slice(5));
+  if(recent.length>1){
+    lineChart(el('chInv'),[
+      ds('Combined',recent.map(h=>({x:h.d.slice(5),y:(h.gv||0)+(h.ov||0)})),'#B08D3E'),
+      ds('Gentry',recent.map(h=>({x:h.d.slice(5),y:h.gv||0})),'#1C1917'),
+      ds('1TimePiece',recent.map(h=>({x:h.d.slice(5),y:h.ov||0})),'#9F1239'),
+    ],true);
+    lineChart(el('chCnt'),[
+      ds('Gentry',recent.map(h=>({x:h.d.slice(5),y:h.gn||0})),'#B08D3E'),
+      ds('1TimePiece',recent.map(h=>({x:h.d.slice(5),y:h.on||0})),'#1C1917'),
+    ],false);
+  } else {
+    [el('chInv'),el('chCnt')].forEach(c=>{ if(c) c.closest('.chart-box').innerHTML='<h3>'+c.closest('.chart-box').querySelector('h3').textContent+'</h3><p class="sub">Builds as the 6-hour refresh accumulates daily history.</p>'; });
   }
 }
+function mtdBySource(src){ const {y:cy,m:cm}=nowParts(); const rows=soldRecords().filter(r=>{const p=ym(r.date);return p&&p.y===cy&&p.mo===cm&&sourceOfSale(r)===src;}); return {n:rows.length,v:sumP(rows)}; }
+
+/* ─────────────── TAB 2 · Dealer Comparison ─────────────── */
+function exposure(items, brand){ let v=0,n=0; items.forEach(w=>{ if((w.brand||'')===brand && w.price){ v+=w.price; n++; } }); return {v,n}; }
+function renderDealers(){
+  const d=STATE.data, ag=d.agg;
+  const gItems=d.gentry||[], oItems=d.onetime||[];
+  const gExp=b=>exposure(gItems,b), oExp=b=>exposure(oItems,b);
+  const gTot=ag.gentry.value||1, oTot=ag.onetime.value||1;
+  const topPartner=ag.onetime.byPartner[0];
+  const partnerShare=topPartner?((topPartner.v/oTot)*100).toFixed(0):0;
+  const expRows=EXPOSURE.map(b=>{
+    const g=gExp(b),o=oExp(b);
+    return `<tr><td>${esc(b)} exposure</td>
+      <td class="num col-gentry">${g.n?full(g.v)+' · '+((g.v/gTot)*100).toFixed(0)+'%':'—'}</td>
+      <td class="num col-onetime">${o.n?full(o.v)+' · '+((o.v/oTot)*100).toFixed(0)+'%':'—'}</td></tr>`;
+  }).join('');
+  const gBrandMax=ag.gentry.byBrand.reduce((m,x)=>Math.max(m,x.v),1);
+  const oBrandMax=ag.onetime.byBrand.reduce((m,x)=>Math.max(m,x.v),1);
+
+  el('view').innerHTML=`
+  <section>
+    <h2>Dealer Comparison</h2>
+    <p class="sub">Gentry (own retail) vs 1TimePiece (consignment, 27 brand tabs) side by side — value, depth, and brand exposure.</p>
+    <div class="cards">
+      <div class="card mine"><div class="label">Gentry · inventory</div><div class="value">${peso(ag.gentry.value)}</div><div class="delta">${ag.gentry.count} watches · avg ${peso(ag.gentry.avg)}</div></div>
+      <div class="card"><div class="label">1TimePiece · inventory</div><div class="value">${peso(ag.onetime.value)}</div><div class="delta">${ag.onetime.count} watches · avg ${peso(ag.onetime.avg)}</div></div>
+      <div class="card"><div class="label">1TP partner concentration</div><div class="value">${partnerShare}%</div><div class="delta">${topPartner?partnerLabel(topPartner.key)+' top · '+ag.onetime.byPartner.length+' partners':'—'}</div></div>
+    </div>
+  </section>
+
+  <section>
+    <h3 style="margin-top:0">Side-by-side metrics</h3>
+    <div class="table-wrap"><table class="cmp">
+      <thead><tr><th>Metric</th><th class="col col-gentry">Gentry ★</th><th class="col col-onetime">1TimePiece</th></tr></thead>
+      <tbody>
+        <tr><td>Inventory value</td><td class="num">${full(ag.gentry.value)}</td><td class="num">${full(ag.onetime.value)}</td></tr>
+        <tr><td>Watches</td><td class="num">${ag.gentry.count}</td><td class="num">${ag.onetime.count}</td></tr>
+        <tr><td>Average ticket</td><td class="num">${peso(ag.gentry.avg)}</td><td class="num">${peso(ag.onetime.avg)}</td></tr>
+        <tr><td>Brands listed</td><td class="num">${ag.gentry.byBrand.length}</td><td class="num">${ag.onetime.byBrand.length}</td></tr>
+        ${expRows}
+        <tr><td>On hold / reserved</td><td class="num">—</td><td class="num">${ag.onetime.held}</td></tr>
+        <tr><td>Partners</td><td class="num">—</td><td class="num">${ag.onetime.byPartner.length}</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <h3 style="margin-top:0">Top brands per dealer</h3>
+    <div class="chart-grid">
+      <div><div class="chart-box bars"><h3 style="margin-bottom:12px">Gentry — value by brand</h3>
+        ${ag.gentry.byBrand.slice(0,8).map(b=>`<div class="row"><div class="k">${esc(b.key)}</div><div class="track"><div class="fill" style="background:var(--gold);width:${Math.max(2,b.v/gBrandMax*100)}%"></div></div><div class="v">${peso(b.v)}</div><div class="n">${b.n}</div></div>`).join('')||'<div class="empty">—</div>'}
+      </div></div>
+      <div><div class="chart-box bars"><h3 style="margin-bottom:12px">1TimePiece — value by brand</h3>
+        ${ag.onetime.byBrand.slice(0,8).map(b=>`<div class="row"><div class="k">${esc(b.key)}</div><div class="track"><div class="fill" style="background:var(--ink);width:${Math.max(2,b.v/oBrandMax*100)}%"></div></div><div class="v">${peso(b.v)}</div><div class="n">${b.n}</div></div>`).join('')||'<div class="empty">—</div>'}
+      </div></div>
+    </div>
+  </section>
+
+  <section>
+    <h3 style="margin-top:0">1TimePiece — partner concentration</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Partner</th><th>Watches</th><th>Value</th><th>Avg</th><th>Share</th></tr></thead>
+      <tbody>${ag.onetime.byPartner.map(p=>`<tr><td><span class="pcode" style="background:${partnerColor(p.key==='Unassigned'?'':p.key)}">${p.key==='Unassigned'?'—':'P'+esc(p.key)}</span> ${esc(partnerLabel(p.key))}</td><td class="num">${p.n}</td><td class="num">${full(p.v)}</td><td class="num">${peso(p.n?p.v/p.n:0)}</td><td class="num">${((p.v/oTot)*100).toFixed(1)}%</td></tr>`).join('')}</tbody>
+    </table></div>
+  </section>`;
+}
+
+/* ─────────────── TAB 3 · Market Movements ─────────────── */
+function renderMovements(){
+  const w30=soldWindow(30).slice().sort((a,b)=>(a.date<b.date?1:-1));
+  const autoRemovals=w30.filter(r=>r.auto);
+  const hiRem=w30.filter(r=>r.price&&r.price>=1e6).sort((a,b)=>b.price-a.price);
+  // by source
+  const bySrc={Gentry:{n:0,v:0},'1TimePiece':{n:0,v:0},Other:{n:0,v:0}};
+  w30.forEach(r=>{ const s=sourceOfSale(r); bySrc[s].n++; bySrc[s].v+=r.price||0; });
+  // by brand
+  const bb={}; w30.forEach(r=>{ const b=r.brand||'Other'; (bb[b]=bb[b]||{n:0,v:0}); bb[b].n++; bb[b].v+=r.price||0; });
+  const byBrand=Object.entries(bb).map(([k,x])=>({k,...x})).sort((a,b)=>b.v-a.v);
+  // hot category alerts on live inventory
+  const live=liveItems();
+  const alerts=HOT.map(([label,test])=>{ const hits=live.filter(w=>w.price&&test(w)); const low=hits.length?Math.min(...hits.map(w=>w.price)):null; return {label,n:hits.length,low,val:sumP(hits)}; });
+
+  el('view').innerHTML=`
+  <section>
+    <h2>Market Movements</h2>
+    <p class="sub">What changed recently — auto-detected sales &amp; removals from the last 30 days, plus live alerts on hot categories.</p>
+    <div class="cards">
+      <div class="card"><div class="label">Removed / sold · 30d</div><div class="value">${w30.length}</div><div class="delta">${peso(sumP(w30))}</div></div>
+      <div class="card"><div class="label">Auto-detected</div><div class="value">${autoRemovals.length}</div><div class="delta">from inventory diffs</div></div>
+      <div class="card"><div class="label">High-value removals</div><div class="value">${hiRem.length}</div><div class="delta">≥ ₱1M · ${peso(sumP(hiRem))}</div></div>
+      <div class="card"><div class="label">Gentry / 1TP</div><div class="value">${bySrc.Gentry.n} / ${bySrc['1TimePiece'].n}</div><div class="delta">${peso(bySrc.Gentry.v)} / ${peso(bySrc['1TimePiece'].v)}</div></div>
+    </div>
+  </section>
+
+  <section>
+    <h3 style="margin-top:0">Newly listed watches</h3>
+    <div class="note">Per-listing first-seen dates aren't tracked yet, so new-arrival detection will populate from the next refreshes onward. No existing data is affected.</div>
+  </section>
+
+  <section>
+    <h3 style="margin-top:0">Live alerts · hot categories</h3>
+    <p class="sub">What's currently available in the most-watched references across both dealers.</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Category</th><th>Live count</th><th>Lowest ask</th><th>Total value</th></tr></thead>
+      <tbody>${alerts.map(a=>`<tr><td>${esc(a.label)}${a.n?' <span class="badge hot">'+a.n+'</span>':''}</td><td class="num">${a.n}</td><td class="num">${a.low!=null?full(a.low):'—'}</td><td class="num">${a.val?peso(a.val):'—'}</td></tr>`).join('')}</tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <h3 style="margin-top:0">Movement by brand · 30d</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Brand</th><th>Sold / removed</th><th>Value</th></tr></thead>
+      <tbody>${byBrand.length?byBrand.map(b=>`<tr><td>${esc(b.k)}</td><td class="num">${b.n}</td><td class="num">${full(b.v)}</td></tr>`).join(''):'<tr><td colspan="3" class="empty">No movement recorded in the last 30 days yet.</td></tr>'}</tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <h3 style="margin-top:0">Recent removals / sales <span class="muted" style="font-weight:400;font-size:13px">(${w30.length})</span></h3>
+    <div class="table-wrap" style="max-height:460px;overflow:auto"><table>
+      <thead><tr><th>Date</th><th>Watch</th><th>Brand</th><th>Ref</th><th>Source</th><th>Price</th></tr></thead>
+      <tbody>${w30.length?w30.slice(0,200).map(r=>`<tr><td class="muted">${r.date||'—'}${r.auto?' <span class="badge auto">AUTO</span>':''}</td><td class="title-cell"><div>${esc(r.model||'watch')}</div></td><td>${esc(r.brand||'—')}</td><td class="muted">${esc(r.ref||'—')}</td><td class="muted">${esc(sourceOfSale(r))}</td><td class="num">${full(r.price)}</td></tr>`).join(''):'<tr><td colspan="6" class="empty">No removals/sales in the last 30 days yet.</td></tr>'}</tbody>
+    </table></div>
+  </section>`;
+}
+
+/* ─────────────── TAB 4 · Brand Intelligence ─────────────── */
+function renderBrands(){
+  const live=liveItems();
+  const w7=soldWindow(7), w30=soldWindow(30);
+  const map={};
+  const ensure=b=>(map[b]=map[b]||{brand:b,liveV:0,liveN:0,gV:0,oV:0,refs:{},s7n:0,s7v:0,s30n:0,s30v:0});
+  live.forEach(w=>{ if(!w.price) return; const m=ensure(w.brand||'Other'); m.liveV+=w.price; m.liveN++; if(w.source==='Gentry') m.gV+=w.price; else m.oV+=w.price; const rf=w.ref||'—'; m.refs[rf]=(m.refs[rf]||0)+1; });
+  w7.forEach(r=>{ const m=ensure(r.brand||'Other'); m.s7n++; m.s7v+=r.price||0; });
+  w30.forEach(r=>{ const m=ensure(r.brand||'Other'); m.s30n++; m.s30v+=r.price||0; });
+  const rows=Object.values(map).sort((a,b)=>b.liveV-a.liveV);
+  const topRefs=m=>Object.entries(m.refs).filter(([k])=>k!=='—').sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,n])=>k+(n>1?' ×'+n:'')).join(', ')||'—';
+
+  el('view').innerHTML=`
+  <section>
+    <h2>Brand Intelligence</h2>
+    <p class="sub">Which brands carry the book and which are moving — live value &amp; depth, source split, recent sell-through, and the references you stock most.</p>
+    <div class="table-wrap" style="max-height:640px;overflow:auto"><table style="min-width:880px">
+      <thead><tr><th>Brand</th><th>Live value</th><th>Pieces</th><th>Avg ticket</th><th>Source split (G/1TP)</th><th>Sold 7d</th><th>Sold 30d</th><th>Top references</th></tr></thead>
+      <tbody>${rows.map(m=>`<tr>
+        <td>${esc(m.brand)}</td>
+        <td class="num">${full(m.liveV)}</td>
+        <td class="num">${m.liveN}</td>
+        <td class="num">${peso(m.liveN?m.liveV/m.liveN:0)}</td>
+        <td class="num">${pct(m.gV,m.gV+m.oV)} / ${pct(m.oV,m.gV+m.oV)}</td>
+        <td class="num">${m.s7n?m.s7n+' · '+peso(m.s7v):'—'}</td>
+        <td class="num">${m.s30n?m.s30n+' · '+peso(m.s30v):'—'}</td>
+        <td class="muted" style="text-align:right">${esc(topRefs(m))}</td>
+      </tr>`).join('')||'<tr><td colspan="8" class="empty">No inventory loaded.</td></tr>'}</tbody>
+    </table></div>
+    <p class="footnote">Source split is share of live value (Gentry / 1TimePiece). Sold figures come from auto-detected + manually logged sales over the trailing window.</p>
+  </section>`;
+}
+function pct(part,tot){ if(!tot) return '—'; return Math.round(part/tot*100)+'%'; }
+
+/* ─────────────── TAB 5 · Reference / Deal Check ─────────────── */
+function renderDealCheck(){
+  el('view').innerHTML=`
+  <section>
+    <h2>Reference / Deal Check</h2>
+    <p class="sub">Buying decision tool. Search a model or reference to pull every live ask (Gentry + 1TimePiece) and your archive comps, then see suggested buy-in prices for target margins.</p>
+    <div class="toolbar"><input id="dcq" class="inp" style="width:320px;max-width:100%" placeholder="e.g. Daytona, 126710, Nautilus, Royal Oak" value="${esc(STATE.lookup)}"></div>
+    <div id="dcResult"></div>
+  </section>`;
+  const inp=el('dcq');
+  inp.oninput=()=>{ STATE.lookup=inp.value; renderDealResult(); };
+  renderDealResult();
+  inp.focus();
+}
+function renderDealResult(){
+  const box=el('dcResult'); if(!box) return;
+  const q=STATE.lookup.trim();
+  if(!q){ box.innerHTML='<div class="muted" style="font-size:13px">Type a model or reference to run the deal check.</div>'; return; }
+  const cs=comps(q);
+  if(!cs.length){ box.innerHTML=`<div class="empty" style="text-align:left">No comps found for “${esc(q)}”. Try a shorter reference or model name.</div>`; return; }
+  const prices=cs.map(c=>c.price).sort((a,b)=>a-b);
+  const min=prices[0], max=prices[prices.length-1];
+  const avg=prices.reduce((a,b)=>a+b,0)/prices.length;
+  const med=prices[Math.floor(prices.length/2)];
+  const gc=cs.filter(c=>c.src==='Gentry'), oc=cs.filter(c=>c.src==='1TimePiece'), ac=cs.filter(c=>c.src==='Archive');
+  const lows=cs.filter(c=>c.src==='Gentry'||c.src==='1TimePiece').map(c=>c.price);
+  const lowestAsk=lows.length?Math.min(...lows):min;
+  const tiers=[10,15,20,25].map(m=>({m,price:Math.round(lowestAsk/(1+m/100))}));
+  const tagCls=t=>{ if(t==='Sold') return 'badge sold'; if(t==='Bought') return 'badge bought'; if(t==='Offer') return 'badge offer'; return 'badge'; };
+  box.innerHTML=`
+  <div class="dark">
+    <div class="label" style="font-size:11px;text-transform:uppercase;letter-spacing:.07em">Deal check · ${esc(q)}</div>
+    <div class="dstat">
+      <div><div class="l">Lowest ask</div><div class="v">${peso(min)}</div></div>
+      <div><div class="l">Average ask</div><div class="v">${peso(avg)}</div></div>
+      <div><div class="l">Median</div><div class="v">${peso(med)}</div></div>
+      <div><div class="l">Highest ask</div><div class="v">${peso(max)}</div></div>
+      <div><div class="l">Comps</div><div class="v">${cs.length}</div></div>
+      <div><div class="l">Gentry / 1TP / Archive</div><div class="v" style="font-size:18px">${gc.length} / ${oc.length} / ${ac.length}</div></div>
+    </div>
+    <div class="tier" style="margin-bottom:16px">
+      <div class="l" style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#C9A75A;margin-bottom:8px">Suggested buy-in vs lowest live ask (${full(lowestAsk)})</div>
+      <div style="display:flex;flex-wrap:wrap;gap:20px">
+        ${tiers.map(t=>`<div><span style="font-size:12px;color:#B6ADA0">${t.m}% margin → buy under </span><span style="font-weight:700;color:#fff">${full(t.price)}</span></div>`).join('')}
+      </div>
+    </div>
+    <div class="l" style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#9C938A;margin-bottom:7px">${cs.length} comps</div>
+    <div style="max-height:300px;overflow:auto"><table>
+      <tbody>${cs.sort((a,b)=>a.price-b.price).slice(0,60).map(c=>`<tr><td class="title-cell"><div>${esc(c.name)}</div></td><td><span class="${tagCls(c.tag)}">${esc(c.tag)}</span></td><td class="muted">${esc(c.date)}</td><td class="num" style="color:#fff;font-weight:600">${full(c.price)}</td></tr>`).join('')}</tbody>
+    </table></div>
+  </div>`;
+}
+
+/* ─────────────── TAB 6 · Inventory Explorer ─────────────── */
+function renderInventory(){
+  const d=STATE.data, ag=d.agg;
+  const brands=[...new Set(liveItems().map(w=>w.brand).filter(Boolean))].sort();
+  const partners=ag.onetime.byPartner.map(p=>p.key).filter(k=>k!=='Unassigned');
+  const f=STATE.inv;
+  el('view').innerHTML=`
+  <section>
+    <h2>Inventory Explorer</h2>
+    <p class="sub">Every live listing across both dealers in one filterable table. Gentry rows link to the product page; 1TimePiece rows keep their partner code.</p>
+    <div class="toolbar">
+      <input id="ivq" class="inp" style="width:220px" placeholder="Search model / reference" value="${esc(f.q)}">
+      <select id="ivsrc" class="inp"><option value="all">All sources</option><option value="Gentry">Gentry</option><option value="1TimePiece">1TimePiece</option></select>
+      <select id="ivbrand" class="inp"><option value="all">All brands</option>${brands.map(b=>`<option value="${esc(b)}">${esc(b)}</option>`).join('')}</select>
+      <select id="ivpartner" class="inp"><option value="all">All partners</option>${partners.map(p=>`<option value="${esc(p)}">Partner ${esc(p)}</option>`).join('')}</select>
+      <select id="ivincl" class="inp"><option value="all">Any inclusions</option><option value="Box">Box</option><option value="Papers">Papers</option><option value="Manuals">Manuals</option></select>
+      <input id="ivmin" class="inp" style="width:110px" placeholder="Min ₱" value="${esc(f.minP)}">
+      <input id="ivmax" class="inp" style="width:110px" placeholder="Max ₱" value="${esc(f.maxP)}">
+      <input id="ivyear" class="inp" style="width:90px" placeholder="Year" value="${esc(f.year)}">
+      <select id="ivsort" class="inp"><option value="value">Price: high → low</option><option value="value_asc">Price: low → high</option><option value="brand">Brand</option><option value="year">Year (newest)</option><option value="name">Name</option></select>
+    </div>
+    <div id="ivResult"></div>
+  </section>`;
+  el('ivsrc').value=f.source; el('ivbrand').value=f.brand; el('ivpartner').value=f.partner; el('ivincl').value=f.incl; el('ivsort').value=f.sort;
+  const upd=()=>{ f.q=el('ivq').value; f.source=el('ivsrc').value; f.brand=el('ivbrand').value; f.partner=el('ivpartner').value; f.incl=el('ivincl').value; f.minP=el('ivmin').value; f.maxP=el('ivmax').value; f.year=el('ivyear').value; f.sort=el('ivsort').value; renderInvResult(); };
+  ['ivq','ivmin','ivmax','ivyear'].forEach(id=>el(id).oninput=upd);
+  ['ivsrc','ivbrand','ivpartner','ivincl','ivsort'].forEach(id=>el(id).onchange=upd);
+  renderInvResult();
+}
+function renderInvResult(){
+  const box=el('ivResult'); if(!box) return; const f=STATE.inv;
+  let items=liveItems();
+  if(f.source!=='all') items=items.filter(w=>w.source===f.source);
+  if(f.brand!=='all') items=items.filter(w=>w.brand===f.brand);
+  if(f.partner!=='all') items=items.filter(w=>(w.partner||'')===f.partner);
+  if(f.incl!=='all') items=items.filter(w=>(w.incl||[]).some(x=>new RegExp(f.incl,'i').test(x)));
+  const q=f.q.trim().toLowerCase(); if(q) items=items.filter(w=>((w.name||'')+' '+(w.ref||'')+' '+(w.brand||'')).toLowerCase().includes(q));
+  const mn=parseInt(String(f.minP).replace(/[^0-9]/g,''),10); const mx=parseInt(String(f.maxP).replace(/[^0-9]/g,''),10);
+  if(!isNaN(mn)) items=items.filter(w=>(w.price||0)>=mn);
+  if(!isNaN(mx)) items=items.filter(w=>(w.price||0)<=mx);
+  if(f.year.trim()) items=items.filter(w=>String(w.year||'').includes(f.year.trim()));
+  const v=w=>(w.price==null?-1:w.price);
+  items=items.slice();
+  if(f.sort==='value') items.sort((a,b)=>v(b)-v(a));
+  else if(f.sort==='value_asc') items.sort((a,b)=>v(a)-v(b));
+  else if(f.sort==='brand') items.sort((a,b)=>(a.brand||'').localeCompare(b.brand||'')||v(b)-v(a));
+  else if(f.sort==='year') items.sort((a,b)=>String(b.year||'').localeCompare(String(a.year||'')));
+  else if(f.sort==='name') items.sort((a,b)=>(a.name||'').localeCompare(b.name||''));
+  const rows=items.slice(0,600).map(w=>{
+    const code=w.partner||'';
+    const priceCell=w.status?`<span class="muted">${esc(w.status)}</span>`:full(w.price);
+    return `<tr>
+      <td>${w.img?`<img class="thumb" src="${esc(w.img)}" loading="lazy" alt="">`:'<div class="thumb"></div>'}</td>
+      <td class="title-cell">${w.url?`<a href="${esc(w.url)}" target="_blank" rel="noopener">${esc(w.name)}</a>`:`<div>${esc(w.name)}</div>`}</td>
+      <td>${esc(w.brand||'—')}</td>
+      <td class="muted">${esc(w.ref||'—')}</td>
+      <td class="muted">${esc(String(w.year||'—'))}</td>
+      <td>${w.source==='Gentry'?'<span class="badge">Gentry</span>':'<span class="badge" style="background:#E7E0F3;color:#4C1D95">1TP</span>'}</td>
+      <td>${code?`<span class="pcode" style="background:${partnerColor(code)}">P${esc(code)}</span>`:'<span class="muted">—</span>'}</td>
+      <td>${(w.incl||[]).map(c=>`<span class="badge" style="background:#F1EADD;color:#6b5318">${esc(c)}</span>`).join(' ')||'<span class="muted">—</span>'}</td>
+      <td class="num">${priceCell}</td>
+    </tr>`;
+  }).join('');
+  box.innerHTML=`
+    <div class="muted" style="font-size:12.5px;margin-bottom:8px">${items.length.toLocaleString()} listing${items.length===1?'':'s'}${items.length>600?' · showing first 600':''}</div>
+    <div class="table-wrap" style="max-height:640px;overflow:auto"><table style="min-width:960px">
+      <thead><tr><th></th><th>Watch</th><th>Brand</th><th>Ref</th><th>Year</th><th>Source</th><th>Partner</th><th>Inclusions</th><th>Price</th></tr></thead>
+      <tbody>${rows||'<tr><td colspan="9" class="empty">No listings match these filters.</td></tr>'}</tbody>
+    </table></div>`;
+}
+
+/* ─────────────── TAB 7 · Reports / Archive ─────────────── */
+function renderReports(){
+  const d=STATE.data, ag=d?d.agg:null;
+  const failed=(d&&d.failed)||[];
+  const auto=STATE.archive.filter(r=>r.auto).length;
+  const sales=soldRecords().slice().sort((a,b)=>(a.date<b.date?1:-1));
+  const ageMin=d&&d.ageMs?Math.round(d.ageMs/60000):0;
+  el('view').innerHTML=`
+  <section>
+    <h2>Reports / Archive</h2>
+    <p class="sub">Admin &amp; backup — add deals by hand, snapshot today's market, export/import the book, and review data quality. Your archive is saved in this browser (localStorage) and the seed file.</p>
+    <div class="cards">
+      <div class="card"><div class="label">Archive entries</div><div class="value">${STATE.archive.length.toLocaleString()}</div><div class="delta">${auto} auto-detected</div></div>
+      <div class="card"><div class="label">Sales logged</div><div class="value">${sales.length}</div><div class="delta">Sold records</div></div>
+      <div class="card"><div class="label">Live data source</div><div class="value" style="font-size:18px">${d?(d.server?'Server snapshot':'Live fetch'):'—'}</div><div class="delta">${d?('updated '+d.generatedAt):'—'}${ageMin?` · ${ageMin}m old`:''}</div></div>
+      <div class="card"><div class="label">Data quality</div><div class="value" style="font-size:18px">${failed.length?failed.length+' tab(s) failed':'All sources OK'}</div><div class="delta">${ag?ag.gentry.count+' Gentry · '+ag.onetime.count+' 1TP':'—'}</div></div>
+    </div>
+    ${failed.length?`<div class="note" style="margin-top:14px">⚠ 1TimePiece tabs that failed to load this refresh (values may be undercounted until next run): ${failed.map(esc).join(', ')}</div>`:''}
+  </section>
+
+  <section>
+    <div class="toolbar">
+      <button class="btn gold" id="rAdd">+ Add entry</button>
+      <button class="btn ghost" id="rLog">Log today's market</button>
+      <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap">
+        <input id="rq" class="inp" style="width:180px" placeholder="Filter archive…" value="${esc(STATE.archiveQ)}">
+        <button class="btn ghost" id="rExpJSON">Export JSON</button>
+        <button class="btn ghost" id="rExpCSV">Export CSV</button>
+        <label class="btn ghost" style="cursor:pointer">Import<input type="file" id="rImp" accept="application/json" style="display:none"></label>
+      </div>
+    </div>
+    <div id="rForm"></div>
+    <div id="rArchive"></div>
+  </section>
+
+  <section>
+    <h3 style="margin-top:0">Sales detail <span class="muted" style="font-weight:400;font-size:13px">(${sales.length})</span></h3>
+    <div class="table-wrap" style="max-height:460px;overflow:auto"><table>
+      <thead><tr><th>Date</th><th>Watch</th><th>Brand</th><th>Ref</th><th>Source</th><th>Price</th><th>Cost</th><th>Profit</th></tr></thead>
+      <tbody>${sales.length?sales.slice(0,400).map(r=>{ const cost=(r.cost!=null&&r.cost!=='')?(+r.cost||0):null; const profit=cost!=null?(r.price||0)-cost:null; return `<tr><td class="muted">${r.date||'—'}${r.auto?' <span class="badge auto">AUTO</span>':''}</td><td class="title-cell"><div>${esc(r.model||'watch')}</div></td><td>${esc(r.brand||'—')}</td><td class="muted">${esc(r.ref||'—')}</td><td class="muted">${esc(sourceOfSale(r))}</td><td class="num">${full(r.price)}</td><td class="num muted">${cost!=null?full(cost):'—'}</td><td class="num ${profit==null?'':(profit>=0?'pos':'neg')}">${profit!=null?full(profit):'—'}</td></tr>`; }).join(''):'<tr><td colspan="8" class="empty">No sales recorded yet.</td></tr>'}</tbody>
+    </table></div>
+  </section>
+
+  <p class="footnote">Deleting an entry only affects your browser's copy of the archive; the committed /data files (snapshot, sales ledger, history) are never modified from here. Export first if unsure.</p>`;
+
+  el('rAdd').onclick=()=>{ STATE.showForm=!STATE.showForm; renderForm(); };
+  el('rLog').onclick=logMarket;
+  el('rExpJSON').onclick=exportJSON;
+  el('rExpCSV').onclick=exportCSV;
+  el('rImp').onchange=importJSON;
+  const rq=el('rq'); rq.oninput=()=>{ STATE.archiveQ=rq.value; renderArchiveTable(); };
+  renderForm(); renderArchiveTable();
+}
+function renderForm(){
+  const box=el('rForm'); if(!box) return;
+  if(!STATE.showForm){ box.innerHTML=''; return; }
+  const f=STATE.form;
+  const fld=(k,label,ph,type)=>`<label style="font-size:11px;color:var(--muted)">${label}<input data-f="${k}" type="${type||'text'}" value="${esc(String(f[k]))}" placeholder="${ph||''}" class="inp" style="display:block;width:100%;margin-top:4px"></label>`;
+  box.innerHTML=`<div class="card" style="margin-bottom:18px">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px">
+      <label style="font-size:11px;color:var(--muted)">Kind<select data-f="kind" class="inp" style="display:block;width:100%;margin-top:4px">
+        <option value="Bought">Bought (we paid)</option><option value="Sold">Sold (we sold)</option><option value="Offer">Offer received</option><option value="Asking">Asking / comp</option></select></label>
+      ${fld('brand','Brand','Rolex')}${fld('model','Model','GMT-Master II Batman')}${fld('ref','Reference','126710BLNR')}
+      ${fld('year','Year','2023')}${fld('cond','Condition','Mint / full set')}${fld('price','Price ₱','1010000')}
+      ${fld('date','Date','','date')}${fld('cost','Cost ₱ (we paid)','for profit on sales')}${fld('source','Source / partner','Walk-in, Partner 3…')}
+      ${fld('incl','Inclusions','Box, Papers, Manuals')}
+      <label style="font-size:11px;color:var(--muted);grid-column:1/-1">Notes<input data-f="notes" value="${esc(f.notes)}" placeholder="anything worth remembering" class="inp" style="display:block;width:100%;margin-top:4px"></label>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="btn" id="rSave">Save to archive</button>
+      <button class="btn ghost" id="rCancel">Cancel</button>
+    </div>
+  </div>`;
+  box.querySelector('[data-f="kind"]').value=f.kind;
+  box.querySelectorAll('[data-f]').forEach(inp=>{ const ev=inp.tagName==='SELECT'?'onchange':'oninput'; inp[ev]=()=>{ STATE.form[inp.dataset.f]=inp.value; }; });
+  el('rSave').onclick=saveRecord; el('rCancel').onclick=()=>{ STATE.showForm=false; renderForm(); };
+}
+function renderArchiveTable(){
+  const box=el('rArchive'); if(!box) return;
+  const q=STATE.archiveQ.trim().toLowerCase();
+  let rows=STATE.archive;
+  if(q) rows=rows.filter(r=>((r.brand||'')+' '+(r.model||'')+' '+(r.ref||'')+' '+(r.source||'')+' '+(r.kind||'')).toLowerCase().includes(q));
+  const tagCls=k=>{ if(k==='Sold') return 'badge sold'; if(k==='Bought') return 'badge bought'; if(k==='Offer') return 'badge offer'; return 'badge'; };
+  box.innerHTML=`
+    <div class="muted" style="font-size:12px;margin-bottom:8px">${STATE.archive.length} entries${q?' · '+rows.length+' shown':''} · saved in this browser</div>
+    <div class="table-wrap" style="max-height:520px;overflow:auto"><table style="min-width:820px">
+      <thead><tr><th>Date</th><th>Kind</th><th>Watch</th><th>Ref</th><th>Source</th><th>Inclusions</th><th>Price</th><th></th></tr></thead>
+      <tbody>${rows.length?rows.slice(0,600).map(r=>`<tr>
+        <td class="muted">${esc(r.date||'—')}</td>
+        <td><span class="${tagCls(r.kind)}">${esc(r.kind||'—')}</span></td>
+        <td class="title-cell"><div>${esc(((r.brand||'')+' '+(r.model||'')).trim()||'—')}</div></td>
+        <td class="muted">${esc(r.ref||'—')}</td>
+        <td class="muted">${esc(r.source||'—')}</td>
+        <td>${(Array.isArray(r.incl)?r.incl:(r.incl?[r.incl]:[])).map(c=>`<span class="badge" style="background:#F1EADD;color:#6b5318">${esc(c)}</span>`).join(' ')}</td>
+        <td class="num">${full(r.price)}</td>
+        <td style="text-align:center"><button data-del="${esc(r.id||'')}" title="Delete entry" style="background:none;border:none;color:#C4BCB0;font-size:15px;cursor:pointer">×</button></td>
+      </tr>`).join(''):'<tr><td colspan="8" class="empty">No entries yet. Add a deal, or “Log today’s market” to seed the book with current comps.</td></tr>'}</tbody>
+    </table></div>`;
+  box.querySelectorAll('[data-del]').forEach(b=> b.onclick=()=>deleteRecord(b.dataset.del));
+}
+
+/* ─────────────── archive actions (schema + behavior preserved) ─────────────── */
+function saveRecord(){
+  const f=STATE.form;
+  if(!f.model && !f.ref && !f.brand) return;
+  const rec={
+    id:'r'+Date.now()+Math.random().toString(36).slice(2,6),
+    kind:f.kind, brand:f.brand.trim(), model:f.model.trim(), ref:f.ref.trim(), year:f.year.trim(), cond:f.cond.trim(),
+    price:f.price?parseInt(String(f.price).replace(/[^0-9]/g,''),10):null,
+    cost:f.cost?parseInt(String(f.cost).replace(/[^0-9]/g,''),10):null,
+    incl:f.incl?f.incl.split(/[,/]+/).map(x=>x.trim()).filter(Boolean):[],
+    date:f.date, source:f.source.trim(), notes:f.notes.trim(),
+  };
+  STATE.archive=[rec, ...STATE.archive]; persistArchive(STATE.archive);
+  STATE.form=blankForm(); STATE.showForm=false; render();
+}
+function deleteRecord(id){
+  const r=STATE.archive.find(x=>x.id===id);
+  const label=r?(((r.brand||'')+' '+(r.model||'')).trim()||r.kind||'this entry'):'this entry';
+  if(!confirm('Delete "'+label+'" from your browser archive?\n\nThis only removes it from this browser — committed /data files are untouched. Export first if unsure.')) return;
+  STATE.archive=STATE.archive.filter(x=>x.id!==id); persistArchive(STATE.archive); renderArchiveTable();
+}
+function logMarket(){
+  const d=STATE.data; if(!d) return;
+  const day=todayStr();
+  const existing=new Set(STATE.archive.map(r=>r.id));
+  const mk=(w,src)=>({ id:'m'+day+'|'+src+'|'+normRef(w.ref||w.name)+'|'+(w.price||0),
+    kind:'Asking', brand:w.brand||'', model:w.name||'', ref:w.ref||'', year:w.year||'', cond:w.cond||'',
+    price:w.price||null, cost:null, incl:w.incl||[], date:day, source:src+(w.partner?' · Partner '+w.partner:''), notes:'auto market snapshot' });
+  const fresh=[];
+  (d.gentry||[]).forEach(w=>{ if(w.price) fresh.push(mk(w,'Gentry')); });
+  (d.onetime||[]).forEach(w=>{ if(w.price) fresh.push(mk(w,'1TimePiece')); });
+  const dedup=fresh.filter(r=>!existing.has(r.id));
+  STATE.archive=[...dedup, ...STATE.archive]; persistArchive(STATE.archive);
+  render();
+}
+function download(name,text,type){ const blob=new Blob([text],{type}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),2000); }
+function exportJSON(){ download('price-archive.json', JSON.stringify(STATE.archive,null,2), 'application/json'); }
+function exportCSV(){
+  const cols=['date','kind','brand','model','ref','year','cond','incl','price','cost','source','notes'];
+  const esc2=v=>'"'+String(v==null?'':(Array.isArray(v)?v.join(' / '):v)).replace(/"/g,'""')+'"';
+  const rows=[cols.join(',')].concat(STATE.archive.map(r=>cols.map(c=>esc2(r[c])).join(',')));
+  download('price-archive.csv', rows.join('\n'), 'text/csv');
+}
+function importJSON(e){
+  const file=e.target.files&&e.target.files[0]; if(!file) return;
+  const fr=new FileReader();
+  fr.onload=()=>{ try{ const arr=JSON.parse(fr.result); if(Array.isArray(arr)){ const byId={}; [...arr,...STATE.archive].forEach(r=>{ if(r&&r.id) byId[r.id]=r; }); STATE.archive=Object.values(byId); persistArchive(STATE.archive); render(); } }catch(err){ alert('Could not read that file.'); } };
+  fr.readAsText(file);
+}
+
+/* ─────────────── boot ─────────────── */
+(async ()=>{
+  STATE.archive = await loadArchive();
+  render();
+  await refresh(false);
+})();
 </script>
 </body>
 </html>
