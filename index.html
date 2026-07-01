@@ -438,6 +438,14 @@ function renderMovements(){
   // hot category alerts on live inventory
   const live=liveItems();
   const alerts=HOT.map(([label,test])=>{ const hits=live.filter(w=>w.price&&test(w)); const low=hits.length?Math.min(...hits.map(w=>w.price)):null; return {label,n:hits.length,low,val:sumP(hits)}; });
+  // monthly sales benchmark (month-over-month, per dealer) — from the full sales ledger
+  const monthMap={};
+  soldRecords().forEach(r=>{ const mth=(r.date||'').slice(0,7); if(!/^\d{4}-\d{2}$/.test(mth)) return; const src=sourceOfSale(r); (monthMap[mth]=monthMap[mth]||{Gentry:{n:0,v:0},'1TimePiece':{n:0,v:0},Other:{n:0,v:0}}); monthMap[mth][src].n++; monthMap[mth][src].v+=r.price||0; });
+  const monthsAsc=Object.keys(monthMap).sort();
+  const monthsDesc=monthsAsc.slice().reverse();
+  const hasOther=monthsAsc.some(m=>monthMap[m].Other.n>0);
+  const srcCols=hasOther?['Gentry','1TimePiece','Other']:['Gentry','1TimePiece'];
+  const mCell=c=>c.n?(c.n+' · '+peso(c.v)):'—';
 
   el('view').innerHTML=`
   <section>
@@ -449,6 +457,16 @@ function renderMovements(){
       <div class="card"><div class="label">High-value removals</div><div class="value">${hiRem.length}</div><div class="delta">≥ ₱1M · ${peso(sumP(hiRem))}</div></div>
       <div class="card"><div class="label">Gentry / 1TP</div><div class="value">${bySrc.Gentry.n} / ${bySrc['1TimePiece'].n}</div><div class="delta">${peso(bySrc.Gentry.v)} / ${peso(bySrc['1TimePiece'].v)}</div></div>
     </div>
+  </section>
+
+  <section>
+    <h3 style="margin-top:0">Monthly sales benchmark</h3>
+    <p class="sub">Units sold &amp; value per month, Gentry vs 1TimePiece — your long-term yardstick across 2026 and beyond. Sales are inferred from inventory removals plus anything logged by hand.</p>
+    <div class="chart-box" style="max-width:960px;margin-bottom:14px"><div style="height:280px"><canvas id="chMonthly"></canvas></div></div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Month</th>${srcCols.map(s=>`<th>${s}</th>`).join('')}<th>Total</th></tr></thead>
+      <tbody>${monthsDesc.length?monthsDesc.map(m=>{ const mm=monthMap[m]; const tot={n:0,v:0}; srcCols.forEach(s=>{tot.n+=mm[s].n;tot.v+=mm[s].v;}); return `<tr><td>${m}</td>${srcCols.map(s=>`<td class="num">${mCell(mm[s])}</td>`).join('')}<td class="num"><strong>${tot.n} · ${peso(tot.v)}</strong></td></tr>`; }).join(''):`<tr><td colspan="${srcCols.length+2}" class="empty">No sales recorded yet.</td></tr>`}</tbody>
+    </table></div>
   </section>
 
   <section>
@@ -480,6 +498,17 @@ function renderMovements(){
       <tbody>${w30.length?w30.slice(0,200).map(r=>`<tr><td class="muted">${r.date||'—'}${r.auto?' <span class="badge auto">AUTO</span>':''}</td><td class="title-cell"><div>${esc(r.model||'watch')}</div></td><td>${esc(r.brand||'—')}</td><td class="muted">${esc(r.ref||'—')}</td><td class="muted">${esc(sourceOfSale(r))}</td><td class="num">${full(r.price)}</td></tr>`).join(''):'<tr><td colspan="6" class="empty">No removals/sales in the last 30 days yet.</td></tr>'}</tbody>
     </table></div>
   </section>`;
+
+  // monthly benchmark grouped bar chart
+  if(window.Chart && monthsAsc.length){
+    const colM={Gentry:'#B08D3E','1TimePiece':'#1C1917',Other:'#9F1239'};
+    charts.push(new Chart(el('chMonthly'),{type:'bar',
+      data:{labels:monthsAsc,datasets:srcCols.map(s=>({label:s,data:monthsAsc.map(m=>monthMap[m][s].n),backgroundColor:colM[s]}))},
+      options:{responsive:true,maintainAspectRatio:false,
+        scales:{y:{title:{display:true,text:'Units sold'},beginAtZero:true,grid:{color:'#F0EAE0'}},x:{grid:{display:false}}},
+        plugins:{legend:{labels:{boxWidth:10,font:{size:11}}},
+          tooltip:{callbacks:{label:c=>{const cell=monthMap[c.label][c.dataset.label];return c.dataset.label+': '+cell.n+' · '+full(cell.v);}}}}}}));
+  } else if(el('chMonthly')){ el('chMonthly').closest('.chart-box').innerHTML='<p class="sub">No sales recorded yet — this fills in as items sell.</p>'; }
 }
 
 /* ─────────────── TAB 4 · Brand Intelligence ─────────────── */
