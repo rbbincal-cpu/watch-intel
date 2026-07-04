@@ -11,13 +11,13 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <style>
 :root{
-  --bg:#FAF6F0; --card:#FFFFFF; --ink:#1C1917; --muted:#78716C; --gold:#B08D3E;
-  --gold-light:#E5D5B0; --line:#EDE6DA; --green:#3F6212; --red:#9F1239; --mine:#FDF6E9;
-  --ink2:#221E1A;
+  --bg:#F6F6F7; --card:#FFFFFF; --ink:#202223; --muted:#6D7175; --gold:#1A1A1A;
+  --gold-light:#EBEBEB; --line:#E1E3E5; --green:#007F5F; --red:#D72C0D; --mine:#F1F1F1;
+  --ink2:#1A1A1A;
 }
 *{box-sizing:border-box;margin:0;}
-body{background:var(--bg);color:var(--ink);font-family:'Inter',-apple-system,sans-serif;font-size:15px;line-height:1.5;}
-h1,h2,h3,.serif{font-family:'Playfair Display',Georgia,serif;font-weight:600;}
+body{background:var(--bg);color:var(--ink);font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;line-height:1.5;}
+h1,h2,h3,.serif{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-weight:600;letter-spacing:-.01em;}
 a{color:inherit;}
 header{border-bottom:1px solid var(--line);background:var(--card);padding:16px 20px;position:sticky;top:0;z-index:20;}
 .header-inner{max-width:1240px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:8px 24px;}
@@ -40,17 +40,17 @@ h2{font-size:25px;margin-bottom:3px;}
 h3{font-size:17px;margin:20px 0 10px;}
 .sub{color:var(--muted);font-size:13px;margin-bottom:14px;max-width:820px;}
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:12px;}
-.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:15px 17px;}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:15px 17px;box-shadow:0 1px 2px rgba(16,24,40,.04),0 1px 3px rgba(16,24,40,.03);}
 .card .label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);}
-.card .value{font-size:25px;font-family:'Playfair Display',serif;margin-top:4px;line-height:1.1;}
+.card .value{font-size:25px;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;margin-top:4px;line-height:1.1;}
 .card .delta{font-size:12px;color:var(--muted);margin-top:3px;}
 .card .chg{font-size:11.5px;font-weight:600;margin-top:5px;}
 .up{color:var(--green);} .down{color:var(--red);} .flat{color:var(--muted);}
-.table-wrap{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:12px;}
+.table-wrap{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 1px 2px rgba(16,24,40,.04),0 1px 3px rgba(16,24,40,.03);}
 table{border-collapse:collapse;width:100%;min-width:640px;font-size:13.5px;}
 th,td{padding:10px 12px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap;}
 th:first-child,td:first-child{text-align:left;}
-th{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600;background:#FCFAF6;position:sticky;top:0;z-index:1;}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600;background:#FAFBFB;position:sticky;top:0;z-index:1;}
 tbody tr:last-child td{border-bottom:none;}
 tr.mine{background:var(--mine);}
 td.title-cell{max-width:330px;}
@@ -58,16 +58,16 @@ td.title-cell>div,td.title-cell a{display:inline-block;max-width:330px;overflow:
 .num{text-align:right;font-variant-numeric:tabular-nums;}
 .muted{color:var(--muted);}
 .neg{color:var(--red);} .pos{color:var(--green);}
-.badge{display:inline-block;font-size:10.5px;padding:2px 8px;border-radius:99px;background:var(--gold-light);color:#6b5318;letter-spacing:.03em;white-space:nowrap;}
-.badge.sold{background:#FCE7EB;color:var(--red);} .badge.bought{background:#DCEAD0;color:var(--green);}
-.badge.offer{background:#E0E7FF;color:#3730A3;} .badge.hot{background:#FBE5E8;color:var(--red);}
-.badge.auto{background:#F1EADD;color:#9a7b2e;} .badge.aged{background:#FEF3C7;color:#92400E;}
+.badge{display:inline-block;font-size:10.5px;padding:2px 8px;border-radius:99px;background:var(--gold-light);color:#303030;letter-spacing:.03em;white-space:nowrap;}
+.badge.sold{background:#FBE9E7;color:var(--red);} .badge.bought{background:#E4F2EC;color:var(--green);}
+.badge.offer{background:#E0E7FF;color:#3730A3;} .badge.hot{background:#FBE9E7;color:var(--red);}
+.badge.auto{background:#EBEBEB;color:#6D7175;} .badge.aged{background:#FBF3D9;color:#B98900;}
 .chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-.chart-box{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;}
+.chart-box{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:0 1px 2px rgba(16,24,40,.04),0 1px 3px rgba(16,24,40,.03);}
 .chart-box h3{margin:0 0 10px;font-size:15px;}
 .bars .row{display:flex;align-items:center;gap:11px;padding:5px 0;}
 .bars .k{width:140px;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.bars .track{flex:1;height:9px;background:#F1EADD;border-radius:99px;overflow:hidden;}
+.bars .track{flex:1;height:9px;background:#EBEBEB;border-radius:99px;overflow:hidden;}
 .bars .fill{height:100%;border-radius:99px;}
 .bars .v{width:70px;text-align:right;font-size:12.5px;font-variant-numeric:tabular-nums;}
 .bars .n{width:34px;text-align:right;font-size:11.5px;color:var(--muted);}
@@ -79,25 +79,25 @@ td.title-cell>div,td.title-cell a{display:inline-block;max-width:330px;overflow:
 .pill.active{border-color:var(--gold);color:var(--ink);background:var(--mine);font-weight:600;}
 .toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:14px;}
 input,select{font:inherit;}
-.inp{border:1px solid #E2DACB;border-radius:8px;padding:8px 11px;background:#fff;font-size:13px;}
-.thumb{width:38px;height:38px;border-radius:7px;object-fit:cover;background:#F1EADD;border:1px solid var(--line);}
+.inp{border:1px solid #C9CCCF;border-radius:8px;padding:8px 11px;background:#fff;font-size:13px;}
+.thumb{width:38px;height:38px;border-radius:7px;object-fit:cover;background:#EBEBEB;border:1px solid var(--line);}
 .pcode{display:inline-block;min-width:26px;text-align:center;font-size:11px;font-weight:600;padding:2px 7px;border-radius:99px;color:#fff;}
 .insight-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;}
-.insight{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;}
+.insight{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;box-shadow:0 1px 2px rgba(16,24,40,.04),0 1px 3px rgba(16,24,40,.03);}
 .insight .tag{font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--gold);}
 .insight p{margin:.4rem 0 0;font-size:14px;line-height:1.45;}
-.dark{background:var(--ink2);border:1px solid #4A3B22;border-radius:14px;padding:20px 22px;color:#EDE7DC;}
-.dark .label{color:#C9A75A;}
+.dark{background:var(--ink2);border:1px solid #3A3A3A;border-radius:14px;padding:20px 22px;color:#E8E8E8;}
+.dark .label{color:#C9CCCF;}
 .dark .dstat{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:14px;margin:6px 0 16px;}
-.dark .dstat .v{font-family:'Playfair Display',serif;font-size:24px;color:#fff;margin-top:2px;}
-.dark .dstat .l{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#9C938A;}
-.dark .tier{background:#2A2420;border:1px solid #4A3B22;border-radius:10px;padding:12px 14px;}
+.dark .dstat .v{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:24px;color:#fff;margin-top:2px;}
+.dark .dstat .l{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#9A9A9A;}
+.dark .tier{background:#2A2A2A;border:1px solid #3A3A3A;border-radius:10px;padding:12px 14px;}
 .dark table{min-width:0;}
-.dark th,.dark td{border-bottom-color:#322D29;color:#E7E1D8;}
-.dark th{background:transparent;color:#9C938A;}
-.note{background:#FBF3E6;border:1px solid #ECDCB8;color:#6b5318;border-radius:10px;padding:10px 14px;font-size:12.5px;margin-bottom:16px;}
+.dark th,.dark td{border-bottom-color:#3A3A3A;color:#E8E8E8;}
+.dark th{background:transparent;color:#9A9A9A;}
+.note{background:#F6F6F7;border:1px solid #E1E3E5;color:#303030;border-radius:10px;padding:10px 14px;font-size:12.5px;margin-bottom:16px;}
 .footnote{font-size:12px;color:var(--muted);margin-top:24px;}
-.empty{padding:30px;text-align:center;color:#A8A29E;font-size:13px;}
+.empty{padding:30px;text-align:center;color:#8C9196;font-size:13px;}
 .loading{display:flex;flex-direction:column;align-items:center;gap:14px;padding:80px 0;color:var(--muted);}
 .spinner{width:34px;height:34px;border:3px solid var(--line);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;}
 @media (max-width:760px){
@@ -148,7 +148,7 @@ function peso(n){ if(n==null||isNaN(n)) return '—'; return '₱'+(n>=1e9?(n/1e
 function full(n){ return (n==null||isNaN(n))?'—':'₱'+Math.round(n).toLocaleString(); }
 function esc(s){ return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 function normRef(s){ return (s||'').toUpperCase().replace(/[^0-9A-Z]/g,''); }
-function partnerColor(code){ const m={'1':'#B08D3E','2':'#1D4ED8','3':'#9F1239','4':'#3F6212','5':'#7C3AED','6':'#0E7490'}; return m[code]||'#A8A29E'; }
+function partnerColor(code){ const m={'1':'#202223','2':'#1D4ED8','3':'#9F1239','4':'#B98900','5':'#7C3AED','6':'#0E7490'}; return m[code]||'#8C9196'; }
 function partnerLabel(code){ return (!code||code==='Unassigned')?'Unassigned':'Partner '+code; }
 function blankForm(){ const d=new Date(Date.now()+8*3600*1000).toISOString().slice(0,10); return {kind:'Bought',brand:'',model:'',ref:'',year:'',cond:'',price:'',cost:'',incl:'',date:d,source:'',notes:''}; }
 function todayStr(){ return new Date(Date.now()+8*3600*1000).toISOString().slice(0,10); }
@@ -245,7 +245,7 @@ function lineChart(canvas, datasets, money){
   const c=new Chart(canvas,{type:'line',data:{datasets},options:{
     responsive:true,maintainAspectRatio:false,interaction:{mode:'nearest',intersect:false},
     scales:{x:{type:'category',grid:{display:false},ticks:{maxTicksLimit:8,font:{size:10}}},
-      y:{ticks:{callback:v=>money?peso(v):v,font:{size:10}},grid:{color:'#F0EAE0'}}},
+      y:{ticks:{callback:v=>money?peso(v):v,font:{size:10}},grid:{color:'#E1E3E5'}}},
     plugins:{legend:{labels:{boxWidth:10,font:{size:11}}},
       tooltip:{callbacks:{label:cc=>cc.dataset.label+': '+(money?full(cc.parsed.y):cc.parsed.y)}}}
   }});
@@ -344,13 +344,13 @@ function renderCockpit(){
   const recent=hist.slice(-60); const labels=recent.map(h=>h.d.slice(5));
   if(recent.length>1){
     lineChart(el('chInv'),[
-      ds('Combined',recent.map(h=>({x:h.d.slice(5),y:(h.gv||0)+(h.ov||0)})),'#B08D3E'),
-      ds('Gentry',recent.map(h=>({x:h.d.slice(5),y:h.gv||0})),'#1C1917'),
-      ds('1TimePiece',recent.map(h=>({x:h.d.slice(5),y:h.ov||0})),'#9F1239'),
+      ds('Combined',recent.map(h=>({x:h.d.slice(5),y:(h.gv||0)+(h.ov||0)})),'#1D4ED8'),
+      ds('Gentry',recent.map(h=>({x:h.d.slice(5),y:h.gv||0})),'#202223'),
+      ds('1TimePiece',recent.map(h=>({x:h.d.slice(5),y:h.ov||0})),'#8C9196'),
     ],true);
     lineChart(el('chCnt'),[
-      ds('Gentry',recent.map(h=>({x:h.d.slice(5),y:h.gn||0})),'#B08D3E'),
-      ds('1TimePiece',recent.map(h=>({x:h.d.slice(5),y:h.on||0})),'#1C1917'),
+      ds('Gentry',recent.map(h=>({x:h.d.slice(5),y:h.gn||0})),'#202223'),
+      ds('1TimePiece',recent.map(h=>({x:h.d.slice(5),y:h.on||0})),'#8C9196'),
     ],false);
   } else {
     [el('chInv'),el('chCnt')].forEach(c=>{ if(c) c.closest('.chart-box').innerHTML='<h3>'+c.closest('.chart-box').querySelector('h3').textContent+'</h3><p class="sub">Builds as the 6-hour refresh accumulates daily history.</p>'; });
@@ -410,7 +410,7 @@ function renderDealers(){
         ${ag.gentry.byBrand.slice(0,8).map(b=>`<div class="row"><div class="k">${esc(b.key)}</div><div class="track"><div class="fill" style="background:var(--gold);width:${Math.max(2,b.v/gBrandMax*100)}%"></div></div><div class="v">${peso(b.v)}</div><div class="n">${b.n}</div></div>`).join('')||'<div class="empty">—</div>'}
       </div></div>
       <div><div class="chart-box bars"><h3 style="margin-bottom:12px">1TimePiece — value by brand</h3>
-        ${ag.onetime.byBrand.slice(0,8).map(b=>`<div class="row"><div class="k">${esc(b.key)}</div><div class="track"><div class="fill" style="background:var(--ink);width:${Math.max(2,b.v/oBrandMax*100)}%"></div></div><div class="v">${peso(b.v)}</div><div class="n">${b.n}</div></div>`).join('')||'<div class="empty">—</div>'}
+        ${ag.onetime.byBrand.slice(0,8).map(b=>`<div class="row"><div class="k">${esc(b.key)}</div><div class="track"><div class="fill" style="background:#8C9196;width:${Math.max(2,b.v/oBrandMax*100)}%"></div></div><div class="v">${peso(b.v)}</div><div class="n">${b.n}</div></div>`).join('')||'<div class="empty">—</div>'}
       </div></div>
     </div>
   </section>
@@ -501,11 +501,11 @@ function renderMovements(){
 
   // monthly benchmark grouped bar chart
   if(window.Chart && monthsAsc.length){
-    const colM={Gentry:'#B08D3E','1TimePiece':'#1C1917',Other:'#9F1239'};
+    const colM={Gentry:'#202223','1TimePiece':'#8C9196',Other:'#9F1239'};
     charts.push(new Chart(el('chMonthly'),{type:'bar',
       data:{labels:monthsAsc,datasets:srcCols.map(s=>({label:s,data:monthsAsc.map(m=>monthMap[m][s].n),backgroundColor:colM[s]}))},
       options:{responsive:true,maintainAspectRatio:false,
-        scales:{y:{title:{display:true,text:'Units sold'},beginAtZero:true,grid:{color:'#F0EAE0'}},x:{grid:{display:false}}},
+        scales:{y:{title:{display:true,text:'Units sold'},beginAtZero:true,grid:{color:'#E1E3E5'}},x:{grid:{display:false}}},
         plugins:{legend:{labels:{boxWidth:10,font:{size:11}}},
           tooltip:{callbacks:{label:c=>{const cell=monthMap[c.label][c.dataset.label];return c.dataset.label+': '+cell.n+' · '+full(cell.v);}}}}}}));
   } else if(el('chMonthly')){ el('chMonthly').closest('.chart-box').innerHTML='<p class="sub">No sales recorded yet — this fills in as items sell.</p>'; }
@@ -586,12 +586,12 @@ function renderDealResult(){
       <div><div class="l">Gentry / 1TP / Archive</div><div class="v" style="font-size:18px">${gc.length} / ${oc.length} / ${ac.length}</div></div>
     </div>
     <div class="tier" style="margin-bottom:16px">
-      <div class="l" style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#C9A75A;margin-bottom:8px">Suggested buy-in vs lowest live ask (${full(lowestAsk)})</div>
+      <div class="l" style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#C9CCCF;margin-bottom:8px">Suggested buy-in vs lowest live ask (${full(lowestAsk)})</div>
       <div style="display:flex;flex-wrap:wrap;gap:20px">
-        ${tiers.map(t=>`<div><span style="font-size:12px;color:#B6ADA0">${t.m}% margin → buy under </span><span style="font-weight:700;color:#fff">${full(t.price)}</span></div>`).join('')}
+        ${tiers.map(t=>`<div><span style="font-size:12px;color:#B0B0B0">${t.m}% margin → buy under </span><span style="font-weight:700;color:#fff">${full(t.price)}</span></div>`).join('')}
       </div>
     </div>
-    <div class="l" style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#9C938A;margin-bottom:7px">${cs.length} comps</div>
+    <div class="l" style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#9A9A9A;margin-bottom:7px">${cs.length} comps</div>
     <div style="max-height:300px;overflow:auto"><table>
       <tbody>${cs.sort((a,b)=>a.price-b.price).slice(0,60).map(c=>`<tr><td class="title-cell"><div>${esc(c.name)}</div></td><td><span class="${tagCls(c.tag)}">${esc(c.tag)}</span></td><td class="muted">${esc(c.date)}</td><td class="num" style="color:#fff;font-weight:600">${full(c.price)}</td></tr>`).join('')}</tbody>
     </table></div>
@@ -657,7 +657,7 @@ function renderInvResult(){
       <td class="muted">${esc(String(w.year||'—'))}</td>
       <td>${w.source==='Gentry'?'<span class="badge">Gentry</span>':'<span class="badge" style="background:#E7E0F3;color:#4C1D95">1TP</span>'}</td>
       <td>${code?`<span class="pcode" style="background:${partnerColor(code)}">P${esc(code)}</span>`:'<span class="muted">—</span>'}</td>
-      <td>${(w.incl||[]).map(c=>`<span class="badge" style="background:#F1EADD;color:#6b5318">${esc(c)}</span>`).join(' ')||'<span class="muted">—</span>'}</td>
+      <td>${(w.incl||[]).map(c=>`<span class="badge" style="background:#EBEBEB;color:#303030">${esc(c)}</span>`).join(' ')||'<span class="muted">—</span>'}</td>
       <td class="num">${priceCell}</td>
     </tr>`;
   }).join('');
@@ -762,9 +762,9 @@ function renderArchiveTable(){
         <td class="title-cell"><div>${esc(((r.brand||'')+' '+(r.model||'')).trim()||'—')}</div></td>
         <td class="muted">${esc(r.ref||'—')}</td>
         <td class="muted">${esc(r.source||'—')}</td>
-        <td>${(Array.isArray(r.incl)?r.incl:(r.incl?[r.incl]:[])).map(c=>`<span class="badge" style="background:#F1EADD;color:#6b5318">${esc(c)}</span>`).join(' ')}</td>
+        <td>${(Array.isArray(r.incl)?r.incl:(r.incl?[r.incl]:[])).map(c=>`<span class="badge" style="background:#EBEBEB;color:#303030">${esc(c)}</span>`).join(' ')}</td>
         <td class="num">${full(r.price)}</td>
-        <td style="text-align:center"><button data-del="${esc(r.id||'')}" title="Delete entry" style="background:none;border:none;color:#C4BCB0;font-size:15px;cursor:pointer">×</button></td>
+        <td style="text-align:center"><button data-del="${esc(r.id||'')}" title="Delete entry" style="background:none;border:none;color:#8C9196;font-size:15px;cursor:pointer">×</button></td>
       </tr>`).join(''):'<tr><td colspan="8" class="empty">No entries yet. Add a deal, or “Log today’s market” to seed the book with current comps.</td></tr>'}</tbody>
     </table></div>`;
   box.querySelectorAll('[data-del]').forEach(b=> b.onclick=()=>deleteRecord(b.dataset.del));
